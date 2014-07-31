@@ -1,0 +1,5 @@
+Rails.application.config.dfile_paths = {
+	"PROCESSING" => "/path/to/processing/folder/",
+	"PACKAGING" => "/path/to/packaging/folder/",
+	"STORE" => "/path/to/store/folder/"
+}
