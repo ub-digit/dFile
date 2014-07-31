@@ -39,6 +39,11 @@ class Path < Pathname
 		return file_list
 	end
 
+	def file_count(type)
+		return nil if !exist? || !directory?
+		return files(type).size
+	end
+
 	# creates catalog structure for the path
 	def create_structure
 		FileManager.create_structure(self.dirname.to_s)

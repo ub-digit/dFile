@@ -84,4 +84,25 @@ describe ItemsController do
 			end
 		end
 	end
+	describe "POST file_count" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				post :file_count, source: "12", type: "pdf"
+				expect(json['msg'] == "Fail").to be true
+			end 
+		end
+		context "with valid attributes" do 
+			it "Creates pdf successfully" do
+				
+				source_dir = @test_path + "text_files"
+				create_folder_with_files(source_dir)
+				source_item = Item.new(Path.new(@test_path + "text_files"))
+				
+				post :file_count, source: source_dir, type: "txt"
+				
+				expect(json['file_count'] == source_item.path.file_count("txt")).to be true
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+	end
 end
