@@ -9,11 +9,11 @@ class ItemsController < ActionController::Base
 	#Copies a file as given destination file
 	def copy_file
 		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
-		destination_file = Item.new(Path.new(params[:dest]+"."+params[:type]))
+		dest_file = Item.new(Path.new(params[:dest]+"."+params[:type]))
 		response = {}
 		response[:source_file] = source_file
-		response[:dest_file] = destination_file
-		if source_file.copy_to(destination_file)
+		response[:dest_file] = dest_file
+		if source_file.copy_to(dest_file)
 			response[:msg] = "Success"
 		else
 			response[:msg] = "Fail"
@@ -41,5 +41,32 @@ class ItemsController < ActionController::Base
 	def list_files
 		source_dir = Path.new(params[:source])
 		render json: source_dir.files
+	end
+
+	# Combines pdf files within a source directory and stores them as a single file
+	def combine_pdf_files
+		source_dir = Item.new(Path.new(params[:source]))
+		dest_file = Item.new(Path.new(params[:dest]+".pdf"))
+
+		response = {}
+		if !source_dir.path.exist?
+			response[:msg] = "Fail"
+			render json: response
+			return
+		end
+
+		dest_file.path.create_structure
+		pdf_files = source_dir.path.files_as_array('pdf')
+
+		response[:source_dir] = source_dir
+		response[:dest_file] = dest_file
+		response[:files_combined_count] = pdf_files.size
+
+		if FileManager.combine_pdf_files(pdf_files,dest_file.path)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
 	end
 end

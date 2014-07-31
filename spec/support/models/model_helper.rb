@@ -33,7 +33,18 @@ module ModelHelper
 		create_file(dir_path + "/test_file_10.doc")
 	end
 
+	def create_image(file_path)
+		`convert -size 100x100 xc:white #{file_path}`
+	end
+
+	def create_pdf_folder(dir_path)
+		create_folder(dir_path)
+		10.times do |x|
+			create_image(dir_path + "/test_pdf#{x}.pdf")
+		end
+	end
+
 	def json
-      @json ||= JSON.parse(response.body)
-    end
+		@json ||= JSON.parse(response.body)
+	end
 end

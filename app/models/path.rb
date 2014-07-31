@@ -29,6 +29,16 @@ class Path < Pathname
 		items
 	end
 
+	# Returns all children of given filetype as an array
+	def files_as_array(file_type = nil)
+		items = files(file_type)
+		file_list = []
+		items.each do |item|
+			file_list << item.path.to_s
+		end
+		return file_list
+	end
+
 	# creates catalog structure for the path
 	def create_structure
 		FileManager.create_structure(self.dirname.to_s)

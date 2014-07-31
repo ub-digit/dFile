@@ -64,6 +64,10 @@ end
 		@path.exist? ? @path.size : 0
 	end
 
+	def empty?
+		@path.size < 1
+	end
+
 	def as_json(options={})
 		{
 			name: @path.basename.to_s,
