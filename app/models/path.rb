@@ -20,6 +20,7 @@ class Path < Pathname
 
 	# Returns all children of given filetype
 	def files(file_type = nil)
+		return [] if !directory?
 		items = []
 		sort_files(children).each do |child|
 			next if !child.file?

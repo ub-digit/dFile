@@ -105,4 +105,24 @@ describe ItemsController do
 			end
 		end
 	end
+	describe "POST list_files" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				post :list_files, source: "12", type: "pdf"
+				expect(json.size).to be 0
+			end 
+		end
+		context "with valid attributes" do 
+			it "returns a list af files" do
+				
+				source_dir = @test_path + "text_files"
+				create_folder_with_files(source_dir)
+				source_item = Item.new(Path.new(@test_path + "text_files"))
+				
+				post :list_files, source: source_dir
+				
+				expect(json.size).to be 6
+			end
+		end
+	end
 end
