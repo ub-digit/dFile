@@ -25,7 +25,7 @@ describe ItemsController do
 		end
 	end
 	describe "POST copy_files" do 
-		context "with valid attributes" do 
+		context "with invalid attributes" do 
 			it "returns a json message" do 
 				post :copy_files, source: "12", dest: "13", type: "txt"
 				expect(json['msg'] == "Fail").to be true
@@ -35,7 +35,30 @@ describe ItemsController do
 			it "Copies files successfully" do
 				source_dir = @test_path + "test_folder"
 				create_folder_with_files(source_dir)
+				source_item = Item.new(Path.new(@test_path + "test_folder"))
+				dest_item = Item.new(Path.new(@test_path + "copied"))
 				post :copy_files, source: source_dir, dest: @test_path + "copied", type: "txt"
+				expect(source_item.size == dest_item.size).to be true
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+	end
+	describe "POST move_files" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				post :move_files, source: "12", dest: "13", type: "txt"
+				expect(json['msg'] == "Fail").to be true
+			end 
+		end
+		context "with valid attributes" do 
+			it "Moves files successfully" do
+				source_dir = @test_path + "test_folder"
+				create_folder_with_files(source_dir)
+				source_item = Item.new(Path.new(@test_path + "test_folder"))
+				source_size = source_item.size
+				dest_item = Item.new(Path.new(@test_path + "copied"))
+				post :move_files, source: source_dir, dest: @test_path + "copied", type: "txt"
+				expect(source_size == dest_item.size).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end

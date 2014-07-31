@@ -21,7 +21,7 @@ class ItemsController < ActionController::Base
 		render json: response
 	end
 
-	#Copies files of a given type from a source directory to destination
+	# Copies files of a given type from a source directory to destination
 	def copy_files
 		source_dir = Item.new(Path.new(params[:source]))
 		dest_dir = Item.new(Path.new(params[:dest]))
@@ -63,6 +63,22 @@ class ItemsController < ActionController::Base
 		response[:files_combined_count] = pdf_files.size
 
 		if FileManager.combine_pdf_files(pdf_files,dest_file.path)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
+	end
+
+	#Moves files of a given type from a source directory to destination
+	def move_files
+		source_dir = Item.new(Path.new(params[:source]))
+		dest_dir = Item.new(Path.new(params[:dest]))
+		type  = params[:type]
+		response = {}
+		response[:source_dir] = source_dir
+		response[:dest_dir] = dest_dir
+		if source_dir.move_files_to(dest_dir, type)
 			response[:msg] = "Success"
 		else
 			response[:msg] = "Fail"

@@ -31,6 +31,17 @@ end
 		return true
 	end
 
+	# Copies file to destination file
+	def move_to(dest_file)
+		return false if !file_exist?
+		
+		return false if !dest_file.path.create_structure
+
+		return false if !FileManager.move(@path,dest_file.path)
+
+		return true
+	end
+
 	# Copies all files of given type to destination directory
 	def copy_files_to(dest_dir, type)
 		return false if !dir?
@@ -39,6 +50,19 @@ end
 		files.each do |source_file|
 			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.path.basename}"))
 			return false if !source_file.copy_to(dest_file)
+		end
+
+		return true
+	end
+
+	# Copies all files of given type to destination directory
+	def move_files_to(dest_dir, type)
+		return false if !dir?
+
+		files = @path.files(type)
+		files.each do |source_file|
+			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.path.basename}"))
+			return false if !source_file.move_to(dest_file)
 		end
 
 		return true

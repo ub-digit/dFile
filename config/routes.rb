@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   controller :items, :defaults => {:format => :json} do
     get '/items/copy_file/:source/:dest/:type', to: 'items#copy_file'
     get '/items/copy_files/:source/:dest/:type', to: 'items#copy_files'
+    get '/items/move_files/:source/:dest/:type', to: 'items#move_files'
     get '/items/list_files/:source', to: 'items#list_files'
     get '/items/combine_pdf_files/:source/:dest', to: 'items#combine_pdf_files'
   end

@@ -1,21 +1,17 @@
 class FileManager
 	# Copies file to destination path 
 	def self.copy(source_path, dest_path)
-		#begin
 		FileUtils.cp(source_path, dest_path)
-		#rescue
-		#	return false
-		#end
 		return true
+	end
+
+	def self.move(source_path, dest_path)
+		FileUtils.mv(source_path, dest_path)
 	end
 
 	# creates catalog structure for given path
 	def self.create_structure(path)
-		#begin
 		FileUtils.mkdir_p(path)
-		#rescue => error
-		#	return false
-		#end
 		return true
 	end
 
