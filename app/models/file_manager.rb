@@ -26,6 +26,14 @@ class FileManager
 
 	# Combines a list of files into a destination file
 	def self.combine_pdf_files(files, dest_file)
-		`gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=#{dest_file.to_s} #{files.join(" ")}` #Use ghostScript to combine pdf-files
+		#`gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=#{dest_file.to_s} #{files.join(" ")}` #Use ghostScript to combine pdf-files
+		args = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', "-sOutputFile=#{dest_file.to_s}"] + files
+		execute(args)
+	end
+
+	def self.execute(args)
+		IO.popen(args) { |io_read|
+			io_read.read
+		}
 	end
 end
