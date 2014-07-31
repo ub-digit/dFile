@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   controller :items, :defaults => {:format => :json} do
     get '/items/copy_file/:source/:dest/:type', to: 'items#copy_file'
+    get '/items/copy_files/:source/:dest/:type', to: 'items#copy_files'
     get '/items/list_files/:source', to: 'items#list_files'
   end
   # The priority is based upon order of creation: first created -> highest priority.

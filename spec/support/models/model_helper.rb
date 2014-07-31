@@ -24,4 +24,16 @@ module ModelHelper
 		file.close
 		return file
 	end
+
+	def create_folder_with_files(dir_path)
+		FileUtils.mkdir(dir_path)
+		5.times do |x|
+			create_file(dir_path + "/test_file#{x}.txt")
+		end
+		create_file(dir_path + "/test_file_10.doc")
+	end
+
+	def json
+      @json ||= JSON.parse(response.body)
+    end
 end

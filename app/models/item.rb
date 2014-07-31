@@ -5,7 +5,7 @@ class Item
 		@path = path
 	end
 
-	#Returns all Items in a directory
+	# Returns all Items in a directory
 	def self.all(dir)
 		@path.children.each do |child|
 			items << Item.new(child)
@@ -14,10 +14,11 @@ class Item
 
 	# Returns checksum of file object
 	def checksum
-		if self.file?
-			return FileManager.checksum(self)
-		end
-	end
+		@checksum ||= FileManager.checksum(@path)
+#		if file?
+#			return FileManager.checksum(@path)
+#		end
+end
 
 	# Copies file to destination file
 	def copy_to(dest_file)
@@ -26,6 +27,19 @@ class Item
 		return false if !dest_file.path.create_structure
 
 		return false if !FileManager.copy(@path,dest_file.path)
+
+		return true
+	end
+
+	# Copies all files of given type to destination directory
+	def copy_files_to(dest_dir, type)
+		return false if !dir?
+
+		files = @path.files(type)
+		files.each do |source_file|
+			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.path.basename}"))
+			return false if !source_file.copy_to(dest_file)
+		end
 
 		return true
 	end
@@ -47,13 +61,14 @@ class Item
 	end
 
 	def size
-		@path.size
+		@path.exist? ? @path.size : 0
 	end
 
 	def as_json(options={})
 		{
 			name: @path.basename.to_s,
-			size: @path.size
+			size: size
 		}
 	end
+
 end

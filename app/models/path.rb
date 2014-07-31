@@ -21,7 +21,7 @@ class Path < Pathname
 	# Returns all children of given filetype
 	def files(file_type = nil)
 		items = []
-		children.each do |child|
+		sort_files(children).each do |child|
 			next if !child.file?
 			next if file_type && child.extname != ".#{file_type}"
 			items << Item.new(child)
@@ -32,5 +32,10 @@ class Path < Pathname
 	# creates catalog structure for the path
 	def create_structure
 		FileManager.create_structure(self.dirname.to_s)
+	end
+
+	# Sorts a list of files based on filename
+	def sort_files(files)
+		files.sort_by { |x| x.basename.to_s[/^(\d+)\./,1].to_i }.map
 	end
 end

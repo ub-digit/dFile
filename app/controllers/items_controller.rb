@@ -11,9 +11,25 @@ class ItemsController < ActionController::Base
 		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
 		destination_file = Item.new(Path.new(params[:dest]+"."+params[:type]))
 		response = {}
-		#response[:source_file] = source_file
-		#response[:dest_file] = destination_file
+		response[:source_file] = source_file
+		response[:dest_file] = destination_file
 		if source_file.copy_to(destination_file)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
+	end
+
+	#Copies files of a given type from a source directory to destination
+	def copy_files
+		source_dir = Item.new(Path.new(params[:source]))
+		dest_dir = Item.new(Path.new(params[:dest]))
+		type  = params[:type]
+		response = {}
+		response[:source_dir] = source_dir
+		response[:dest_dir] = dest_dir
+		if source_dir.copy_files_to(dest_dir, type)
 			response[:msg] = "Success"
 		else
 			response[:msg] = "Fail"
@@ -25,10 +41,5 @@ class ItemsController < ActionController::Base
 	def list_files
 		source_dir = Path.new(params[:source])
 		render json: source_dir.files
-	end
-
-	# Sorts a list of files based on filename
-	def sort_files(files)
-		files.sort_by { |x| x.basename.to_s[/^(\d+)\./,1].to_i }.map
 	end
 end

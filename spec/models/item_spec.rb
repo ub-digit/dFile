@@ -6,7 +6,7 @@ end
 
 describe Item do
 	before :each do
-		@test_path = Rails.root.to_s+"/tmp/testdata/"
+		@test_path = Rails.root.to_s + "/tmp/testdata/"
 		initiate_test_environment(@test_path)
 	end
 	it "should have path after init" do
@@ -14,16 +14,26 @@ describe Item do
 		expect(item.path).to be_a Path
 	end
 	it "should copy a file successfully" do
-		source_file = create_file(@test_path+"testfil.txt")
+		source_file = create_file(@test_path + "testfile.txt")
 		source_item = Item.new(Path.new(source_file.path))
 
-		dest_item = Item.new(Path.new(@test_path+"/kopia/kopia.txt"))
+		dest_item = Item.new(Path.new(@test_path + "/copy/copy.txt"))
 
 		source_item.copy_to(dest_item)
-		source_file
 
 		expect(dest_item.path.exist?).to be true
 		expect(dest_item.path.file?).to be true
 		expect(dest_item.size == source_item.size).to be true
+	end
+	it "should copy a folder of files successfully" do
+		source_dir = @test_path + "test_folder"
+		create_folder_with_files(source_dir)
+		source_item = Item.new(Path.new(source_dir))
+
+		dest_item = Item.new(Path.new(@test_path + "copy/copyfolder"))
+
+		source_item.copy_files_to(dest_item,'txt')
+
+		expect(dest_item.path.files('txt').size == source_item.path.files('txt').size).to be true
 	end
 end
