@@ -4,7 +4,7 @@ RSpec.configure do |c|
   c.include ModelHelper
 end
 
-describe Item do
+describe Path do
 	before :each do
 		@test_path = Rails.root.to_s + "/tmp/testdata/"
 		initiate_test_environment(@test_path)

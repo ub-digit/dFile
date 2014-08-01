@@ -43,6 +43,21 @@ describe ItemsController do
 			end
 		end
 	end
+	describe "GET move_file" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				get :move_file, source: "12", dest: "13", type: "txt"
+				expect(json['msg'] == "Fail").to be true
+			end 
+		end
+		context "with valid attributes" do 
+			it "Moves a file successfully" do
+				create_file(@test_path + "testfile.txt")
+				get :move_file, source: @test_path + "testfile", dest: @test_path + "moved", type: "txt"
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+	end
 	describe "GET move_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
@@ -158,6 +173,28 @@ describe ItemsController do
 				source_item = Item.new(Path.new(@test_path + "test_folder"))
 				dest_item = Item.new(Path.new(@test_path + "copied"))
 				get :copy_and_convert_images, source: source_dir, dest: @test_path + "copied", source_type: "jpg"
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+	end
+	describe "GET copy_and_convert_image" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				get :copy_and_convert_image, source: "12", dest: "13", source_type: "tif", dest_type: "jpg"
+				expect(json['msg'] == "Fail").to be true
+			end 
+		end
+		context "with valid attributes" do 
+			it "Copies files successfully" do
+				create_image(@test_path + "testfile.tif")
+				get :copy_and_convert_image, source: @test_path + "testfile", source_type: 'tif', dest: @test_path + "copied", dest_type: 'tif', quality: 50, size: 25
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+		context "with valid attributes without parameters" do 
+			it "Copies files successfully" do
+				create_image(@test_path + "testfile.tif")
+				get :copy_and_convert_image, source: @test_path + "testfile", source_type: 'tif', dest: @test_path + "copied"
 				expect(json['msg'] == "Success").to be true
 			end
 		end

@@ -88,6 +88,22 @@ class ItemsController < ApplicationController
 	end
 
 	#Moves files of a given type from a source directory to destination
+	def move_file
+		source_file = Item.new(Path.new(params[:source] + "." + params[:type]))
+		dest_file = Item.new(Path.new(params[:dest] + "." + params[:type]))
+
+		response = {}
+		response[:source_file] = source_file
+		response[:dest_file] = dest_file
+		if source_file.move_to(dest_file)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
+	end
+
+	#Moves files of a given type from a source directory to destination
 	def move_files
 		source_dir = Item.new(Path.new(params[:source]))
 		dest_dir = Item.new(Path.new(params[:dest]))
@@ -150,5 +166,24 @@ class ItemsController < ApplicationController
 		end
 		render json: response
 
+	end
+
+	# Copies images of specified type from source directory to destination, converted with given parameters
+	def copy_and_convert_image
+		source_file = Item.new(Path.new(params[:source] + "." + params[:source_type]))
+		destination_type = params[:dest_type] || params[:source_type]
+		dest_file = Item.new(Path.new(params[:dest] + "." + destination_type))
+		quality = params[:quality]
+		size = params[:size]
+
+		response = {}
+		response[:source_file] = source_file
+		response[:dest_file] = dest_file
+		if source_file.copy_and_convert_to(dest_file, quality, size)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
 	end
 end

@@ -25,9 +25,8 @@ class FileManager
 		checksum_value
 	end
 
-	# Combines a list of files into a destination file
+	# Combines a list of files into a destination file using ghostscript
 	def self.combine_pdf_files(files, dest_file)
-		#`gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=#{dest_file.to_s} #{files.join(" ")}` #Use ghostScript to combine pdf-files
 		args = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', "-sOutputFile=#{dest_file.to_s}"] + files
 		execute(args)
 	end
