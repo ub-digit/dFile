@@ -1,4 +1,4 @@
-class ItemsController < ActionController::Base
+class ItemsController < ApplicationController
 
 	# Calculate checksum of file
 	def checksum 
@@ -102,5 +102,17 @@ class ItemsController < ActionController::Base
 			response[:msg] = "Fail"
 		end
 		render json: response
+	end
+
+	# Returns an image file
+	def get_image
+		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
+		#image_folder = Pathname.new(job.job_processing_folder.to_s + "/work/small")
+		#image_name = Pathname.new(sprintf("%s/%04i.jpg",image_folder.to_s, page.to_i))
+		begin
+			send_file source_file.path, :filename => source_file.path.basename.to_s, :type => "image/#{params[:type]}"
+		rescue 
+			not_found
+		end
 	end
 end

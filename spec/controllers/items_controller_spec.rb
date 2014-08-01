@@ -9,25 +9,25 @@ describe ItemsController do
 		@test_path = Rails.root.to_s + "/tmp/testdata/"
 		initiate_test_environment(@test_path)
 	end
-	describe "POST copy_file" do 
+	describe "GET copy_file" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :copy_file, source: "12", dest: "13", type: "txt"
+				get :copy_file, source: "12", dest: "13", type: "txt"
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
 		context "with valid attributes" do 
 			it "Copies a file successfully" do
 				create_file(@test_path + "testfile.txt")
-				post :copy_file, source: @test_path + "testfile", dest: @test_path + "copied", type: "txt"
+				get :copy_file, source: @test_path + "testfile", dest: @test_path + "copied", type: "txt"
 				expect(json['msg'] == "Success").to be true
 			end
 		end
 	end
-	describe "POST copy_files" do 
+	describe "GET copy_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :copy_files, source: "12", dest: "13", type: "txt"
+				get :copy_files, source: "12", dest: "13", type: "txt"
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
@@ -37,16 +37,16 @@ describe ItemsController do
 				create_folder_with_files(source_dir)
 				source_item = Item.new(Path.new(@test_path + "test_folder"))
 				dest_item = Item.new(Path.new(@test_path + "copied"))
-				post :copy_files, source: source_dir, dest: @test_path + "copied", type: "txt"
+				get :copy_files, source: source_dir, dest: @test_path + "copied", type: "txt"
 				expect(source_item.size == dest_item.size).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end
 	end
-	describe "POST move_files" do 
+	describe "GET move_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :move_files, source: "12", dest: "13", type: "txt"
+				get :move_files, source: "12", dest: "13", type: "txt"
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
@@ -57,16 +57,16 @@ describe ItemsController do
 				source_item = Item.new(Path.new(@test_path + "test_folder"))
 				source_size = source_item.size
 				dest_item = Item.new(Path.new(@test_path + "copied"))
-				post :move_files, source: source_dir, dest: @test_path + "copied", type: "txt"
+				get :move_files, source: source_dir, dest: @test_path + "copied", type: "txt"
 				expect(source_size == dest_item.size).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end
 	end
-	describe "POST combine_pdf_files" do 
+	describe "GET combine_pdf_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :combine_pdf_files, source: "12", dest: "13"
+				get :combine_pdf_files, source: "12", dest: "13"
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
@@ -77,17 +77,17 @@ describe ItemsController do
 				create_pdf_folder(source_dir)
 				dest_item = Item.new(Path.new(@test_path + "full.pdf"))
 				
-				post :combine_pdf_files, source: source_dir, dest: @test_path + "full"
+				get :combine_pdf_files, source: source_dir, dest: @test_path + "full"
 				
 				expect(dest_item.path.exist? && dest_item.path.file?).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end
 	end
-	describe "POST file_count" do 
+	describe "GET file_count" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :file_count, source: "12", type: "pdf"
+				get :file_count, source: "12", type: "pdf"
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
@@ -98,17 +98,17 @@ describe ItemsController do
 				create_folder_with_files(source_dir)
 				source_item = Item.new(Path.new(@test_path + "text_files"))
 				
-				post :file_count, source: source_dir, type: "txt"
+				get :file_count, source: source_dir, type: "txt"
 				
 				expect(json['file_count'] == source_item.path.file_count("txt")).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end
 	end
-	describe "POST list_files" do 
+	describe "GET list_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				post :list_files, source: "12", type: "pdf"
+				get :list_files, source: "12", type: "pdf"
 				expect(json.size).to be 0
 			end 
 		end
@@ -119,9 +119,27 @@ describe ItemsController do
 				create_folder_with_files(source_dir)
 				source_item = Item.new(Path.new(@test_path + "text_files"))
 				
-				post :list_files, source: source_dir
+				get :list_files, source: source_dir
 				
 				expect(json.size).to be 6
+			end
+		end
+	end
+	describe "GET get_image" do 
+		context "with invalid attributes" do 
+			it "returns a 404 error" do 
+				response = get :get_image, source: "12", type: "tif"
+				expect(response.status).to be 404
+			end
+		end
+		context "with valid attributes" do 
+			it "returns an image" do
+
+				source_dir = @test_path + "test_image"
+				create_image(source_dir + ".jpg")
+				
+				result = get :get_image, source: source_dir, type: "jpg"
+				expect(result.body).to eq IO.binread(source_dir + ".jpg")
 			end
 		end
 	end

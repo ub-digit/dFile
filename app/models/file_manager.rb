@@ -32,6 +32,7 @@ class FileManager
 	end
 
 	def self.execute(args)
+		output = nil
 		IO.popen(args) { |io_read|
 			io_read.read
 		}

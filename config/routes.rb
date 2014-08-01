@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     get '/items/list_files/:source', to: 'items#list_files'
     get '/items/combine_pdf_files/:source/:dest', to: 'items#combine_pdf_files'
     get '/items/file_count/:source/:type', to: 'items#file_count'
+    get '/items/get_image/:source/:type', to: 'items#get_image'
   end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
