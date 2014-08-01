@@ -18,10 +18,11 @@ class FileManager
 	# Returns checksum for a Pathname
 	def self.checksum(file_path)
 		return false if !file_path.file?
+		checksum_value = nil
 		file_path.open("rb") do |file|
-			checksum = Digest::SHA512.hexdigest(file.read)
+			checksum_value = Digest::SHA512.hexdigest(file.read)
 		end
-		return checksum
+		checksum_value
 	end
 
 	# Combines a list of files into a destination file

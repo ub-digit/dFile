@@ -2,8 +2,25 @@ class ItemsController < ApplicationController
 
 	# Calculate checksum of file
 	def checksum 
-		file = Item.new(Path.new(params[:file_path]))
-		return file.checksum
+		source_file = Item.new(Path.new(params[:source_file]))
+		response = {}
+		response[:source_file] = source_file
+
+		if !source_file.path.exist?
+			response[:msg] = "Fail"
+			render json: response
+			return
+		end
+		puts source_file.path.to_s
+		checksum = FileManager.checksum(source_file.path)
+
+		if checksum
+			response[:msg] = "Success"
+			response[:checksum] = checksum
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
 	end	
 
 	#Copies a file as given destination file

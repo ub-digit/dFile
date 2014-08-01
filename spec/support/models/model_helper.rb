@@ -20,7 +20,7 @@ module ModelHelper
 
 	def create_file(file_path, data = "A string to verify that this file is part of a test")
 		file = File.open(file_path,'w')
-		file.puts(data)
+		file.write(data)
 		file.close
 		return file
 	end
