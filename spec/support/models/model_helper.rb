@@ -18,9 +18,9 @@ module ModelHelper
 		FileUtils.mkdir(test_path) # Create new test folder
 	end
 
-	def create_file(file_path)
+	def create_file(file_path, data = "A string to verify that this file is part of a test")
 		file = File.open(file_path,'w')
-		file.puts("A string to verify that this file is part of a test")
+		file.puts(data)
 		file.close
 		return file
 	end
@@ -31,6 +31,14 @@ module ModelHelper
 			create_file(dir_path + "/test_file#{x}.txt")
 		end
 		create_file(dir_path + "/test_file_10.doc")
+	end
+
+	def create_folder_with_images(dir_path)
+		FileUtils.mkdir(dir_path)
+		5.times do |x|
+			create_image(dir_path + "/test_file#{x}.jpg")
+		end
+		create_image(dir_path + "/test_file_10.tif")
 	end
 
 	def create_image(file_path)

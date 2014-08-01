@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
   end
 
   def record_not_found
-  	#raise ActionController::RoutingError.new('Not Found')
-  	render plain: "404 Not Found", status: 404
+  	render json: {msg: "Fail!"}, status: 404
   end
 end

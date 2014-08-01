@@ -62,4 +62,27 @@ describe Item do
 		expect(dest_item.path.files('txt').size == source_size).to be true
 		expect(source_item.path.file_count('txt')).to be 0
 	end
+	it "should copy and convert an image successfully" do
+		source_file = @test_path + "testfile.tif"
+		create_image(source_file)
+		source_item = Item.new(Path.new(source_file))
+
+		dest_item = Item.new(Path.new(@test_path + "/copy/copy.jpg"))
+
+		source_item.copy_and_convert_to(dest_item, 50, 25)
+
+		expect(dest_item.path.exist?).to be true
+		expect(dest_item.path.file?).to be true
+	end
+	it "should copy and convert a folder of images successfully" do
+		source_dir = @test_path + "test_folder"
+		create_folder_with_images(source_dir)
+		source_item = Item.new(Path.new(source_dir))
+
+		dest_item = Item.new(Path.new(@test_path + "copy/copyfolder"))
+
+		source_item.copy_and_convert_files_to(dest_item,'jpg', 'jpg', 50, 25)
+
+		expect(dest_item.path.files('jpg').size == source_item.path.files('jpg').size).to be true
+	end
 end

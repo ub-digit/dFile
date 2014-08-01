@@ -104,15 +104,34 @@ class ItemsController < ApplicationController
 		render json: response
 	end
 
-	# Returns an image file
+	# Returns an image file from source directory and file type
 	def get_image
 		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
-		#image_folder = Pathname.new(job.job_processing_folder.to_s + "/work/small")
-		#image_name = Pathname.new(sprintf("%s/%04i.jpg",image_folder.to_s, page.to_i))
 		begin
 			send_file source_file.path, :filename => source_file.path.basename.to_s, :type => "image/#{params[:type]}"
 		rescue 
 			not_found
 		end
+	end
+
+	# Copies images of specified type from source directory to destination, converted with given parameters
+	def copy_and_convert_images
+		source_dir = Item.new(Path.new(params[:source]))
+		dest_dir = Item.new(Path.new(params[:dest]))
+		source_type = params[:source_type]
+		dest_type = params[:dest_type]
+		quality = params[:quality]
+		size = params[:size]
+
+		response = {}
+		response[:source_dir] = source_dir
+		response[:dest_dir] = dest_dir
+		if source_dir.copy_and_convert_files_to(dest_dir, source_type, dest_type, quality, size)
+			response[:msg] = "Success"
+		else
+			response[:msg] = "Fail"
+		end
+		render json: response
+
 	end
 end

@@ -143,4 +143,23 @@ describe ItemsController do
 			end
 		end
 	end
+
+	describe "GET copy_and_convert_images" do 
+		context "with invalid attributes" do 
+			it "returns a json message" do 
+				get :copy_and_convert_images, source: "12", dest: "13", source_type: "txt"
+				expect(json['msg'] == "Fail").to be true
+			end 
+		end
+		context "with valid attributes" do 
+			it "Copies files successfully" do
+				source_dir = @test_path + "test_folder"
+				create_folder_with_images(source_dir)
+				source_item = Item.new(Path.new(@test_path + "test_folder"))
+				dest_item = Item.new(Path.new(@test_path + "copied"))
+				get :copy_and_convert_images, source: source_dir, dest: @test_path + "copied", source_type: "jpg"
+				expect(json['msg'] == "Success").to be true
+			end
+		end
+	end
 end

@@ -68,6 +68,30 @@ end
 		return true
 	end
 
+	# Copies file to destination file
+	def copy_and_convert_to(dest_file, quality = nil, size = nil)
+		return false if !file_exist?
+
+		return false if !dest_file.path.create_structure
+
+		return false if !FileManager.copy_and_convert(@path,dest_file.path, quality, size)
+		
+		return true
+	end
+
+	# Copies and converts all files of given type to destination directory
+	def copy_and_convert_files_to(dest_dir, source_type, dest_type = nil, quality = nil, size = nil)
+		return false if !dir?
+		dest_file_type = dest_type || source_type
+		files = @path.files(source_type)
+		files.each do |source_file|
+			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.filename}.#{dest_file_type}"))
+			return false if !source_file.copy_and_convert_to(dest_file, quality, size)
+		end
+
+		return true
+	end
+
 	def dir?
 		@path.directory?
 	end
@@ -90,6 +114,10 @@ end
 
 	def empty?
 		@path.size < 1
+	end
+
+	def filename
+		@path.basename('.*')
 	end
 
 	def as_json(options={})
