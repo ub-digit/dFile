@@ -30,6 +30,10 @@ config/database.yml
 config/initializers/api_key.rb
 config/initializers/config.rb
 
+config/deploy/lab.rb
+config/deploy/staging.rb
+config/deploy/production.rb
+
 # Ignore generated css etc.
 .sass-cache/
 public/assets/
