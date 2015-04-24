@@ -23,7 +23,7 @@ class ItemsController < ApplicationController
 		render json: response
 	end	
 
-  # Returns a file
+  # Returns a file, or information about a file
   def download_file
     source_file = Item.new(Path.new(params[:source_file]))
     response = {}
@@ -31,7 +31,7 @@ class ItemsController < ApplicationController
 
     if !source_file.path.exist?
       response[:msg] = "Fail"
-      render json: response
+      render json: response, status: 404
       return
     end
 
