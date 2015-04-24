@@ -11,7 +11,7 @@ class ItemsController < ApplicationController
 			render json: response
 			return
 		end
-		puts source_file.path.to_s
+
 		checksum = FileManager.checksum(source_file.path)
 
 		if checksum
@@ -22,6 +22,25 @@ class ItemsController < ApplicationController
 		end
 		render json: response
 	end	
+
+  # Returns a file
+  def download_file
+    source_file = Item.new(Path.new(params[:source_file]))
+    response = {}
+    response[:source_file] = source_file
+
+    if !source_file.path.exist?
+      response[:msg] = "Fail"
+      render json: response
+      return
+    end
+
+    respond_to do |format|
+      format.json { render json: response }
+      format.file { send_file source_file.path.to_path }
+    end
+    
+  end
 
 	#Copies a file as given destination file
 	def copy_file
