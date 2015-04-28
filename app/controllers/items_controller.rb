@@ -76,7 +76,7 @@ class ItemsController < ApplicationController
 	# Returns a list of all files in directory
 	def list_files
 		source_dir = Path.new(params[:source])
-		render json: source_dir.files
+		render json: source_dir.files(params[:ext])
 	end
 
 	# Combines pdf files within a source directory and stores them as a single file
@@ -108,8 +108,8 @@ class ItemsController < ApplicationController
 
 	#Moves files of a given type from a source directory to destination
 	def move_file
-		source_file = Item.new(Path.new(params[:source] + "." + params[:type]))
-		dest_file = Item.new(Path.new(params[:dest] + "." + params[:type]))
+		source_file = Item.new(Path.new(params[:source_file]))
+		dest_file = Item.new(Path.new(params[:dest_file]))
 
 		response = {}
 		response[:source_file] = source_file

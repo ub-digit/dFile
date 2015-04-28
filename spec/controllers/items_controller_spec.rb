@@ -53,7 +53,7 @@ describe ItemsController do
 		context "with valid attributes" do 
 			it "Moves a file successfully" do
 				create_file(@test_path + "testfile.txt")
-				get :move_file, source: @test_path + "testfile", dest: @test_path + "moved", type: "txt"
+				get :move_file, source_file: @test_path + "testfile.txt", dest_file: @test_path + "moved.txt"
 				expect(json['msg'] == "Success").to be true
 			end
 		end
@@ -139,6 +139,19 @@ describe ItemsController do
 				expect(json.size).to be 6
 			end
 		end
+
+    context "with a given file type" do 
+      it "returns a list af files" do
+        
+        source_dir = @test_path + "text_files"
+        create_folder_with_files(source_dir)
+        source_item = Item.new(Path.new(@test_path + "text_files"))
+        
+        get :list_files, source: source_dir, ext: 'txt'
+        
+        expect(json.size).to be 5
+      end
+    end
 	end
 	describe "GET get_image" do 
 		context "with invalid attributes" do 
