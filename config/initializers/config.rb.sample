@@ -3,3 +3,4 @@ Rails.application.config.dfile_paths = {
 	"PACKAGING" => "/path/to/packaging/folder/",
 	"STORE" => "/path/to/store/folder/"
 }
+Rails.application.config.api_key = "test_key"
