@@ -22,9 +22,27 @@ describe ItemsController do
 				create_file(@test_path + "testfile.txt")
 				get :copy_file, source: @test_path + "testfile", dest: @test_path + "copied", type: "txt", api_key: @api_key
 				expect(json['msg'] == "Success").to be true
+        expect(response.status).to eq 200
 			end
 		end
 	end
+  describe "POST create_file" do
+    context "With valid attributes" do
+      it "should return success" do
+        post :create_file, dest_file: @test_path + 'createdFile.txt', content: "My content", api_key: @api_key
+        expect(json['msg'] == "Success").to be true
+        expect(response.status).to eq 200
+      end
+    end
+    context "With invalid attributes" do
+      it "should return fail" do
+        create_file(@test_path + "createdFile.txt")
+        post :create_file, dest_file: @test_path + 'createdFile.txt', content: "My content", api_key: @api_key
+        expect(json['msg'] == "Fail").to be true
+        expect(response.status).to eq 402
+      end
+    end
+  end
 	describe "GET copy_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 

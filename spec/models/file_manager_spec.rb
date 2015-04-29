@@ -70,4 +70,16 @@ describe FileManager do
 
 		expect(dest_path.exist? && dest_path.file?).to be true
 	end
+
+  it "should create a file successfully" do
+    dest_file = Path.new(@test_path + "createdfile.txt")
+    content = "random content"
+
+    FileManager.create(dest_file, content)
+
+    expect(dest_file.exist?).to be_truthy
+    expect(dest_file.file?).to be_truthy
+    expect(dest_file.size > 0).to be_truthy
+    expect(File.new(dest_file).read).to eq "random content"
+  end
 end

@@ -13,6 +13,19 @@ describe Item do
 		item = Item.new(Path.new("TEST:123"))
 		expect(item.path).to be_a Path
 	end
+  it "should create a file successfully" do
+    dest_item = Item.new(Path.new(@test_path + "createdFile.txt"))
+    dest_item.create("My content")
+
+    expect(dest_item.path.exist?).to be true
+    expect(dest_item.path.file?).to be true
+    expect(dest_item.size > 0).to be true
+  end
+  it "should not create a file if it already exists" do
+    source_file = create_file(@test_path + "testfile.txt")
+    dest_item = Item.new(Path.new(@test_path + "testfile.txt"))
+    expect(dest_item.create("My content")).to be_falsey
+  end
 	it "should copy a file successfully" do
 		source_file = create_file(@test_path + "testfile.txt")
 		source_item = Item.new(Path.new(source_file.path))

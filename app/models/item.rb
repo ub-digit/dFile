@@ -15,10 +15,20 @@ class Item
 	# Returns checksum of file object
 	def checksum
 		@checksum ||= FileManager.checksum(@path)
-#		if file?
-#			return FileManager.checksum(@path)
-#		end
-end
+  #		if file?
+  #			return FileManager.checksum(@path)
+  #		end
+  end
+
+  def create(content)
+    return false if file_exist?
+
+    return false if !path.create_structure
+
+    return false if !FileManager.create(@path,content)
+
+    return true
+  end
 
 	# Copies file to destination file
 	def copy_to(dest_file)

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   controller :items, :defaults => {:format => :json} do
     get '/checksum', to: 'items#checksum'
+    post '/create_file', to: 'items#create_file'
     get '/copy_file', to: 'items#copy_file'
     get '/copy_files', to: 'items#copy_files'
     get '/move_files', to: 'items#move_files'

@@ -42,6 +42,21 @@ class ItemsController < ApplicationController
     
   end
 
+  #Copies a file as given destination file
+  def create_file
+    dest_file = Item.new(Path.new(params[:dest_file]))
+    content = params[:content]
+    response = {}
+    response[:dest_file] = dest_file
+    if dest_file.create(content)
+      response[:msg] = "Success"
+      render json: response, status: 200
+    else
+      response[:msg] = "Fail"
+      render json: response, status: 402
+    end
+  end
+
 	#Copies a file as given destination file
 	def copy_file
 		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
