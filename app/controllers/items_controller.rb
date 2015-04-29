@@ -131,10 +131,11 @@ class ItemsController < ApplicationController
 		response[:dest_file] = dest_file
 		if source_file.move_to(dest_file)
 			response[:msg] = "Success"
+      render json: response, status: 200
 		else
 			response[:msg] = "Fail"
+      render json: response, status: 402
 		end
-		render json: response
 	end
 
 	#Moves files of a given type from a source directory to destination
@@ -147,11 +148,29 @@ class ItemsController < ApplicationController
 		response[:dest_dir] = dest_dir
 		if source_dir.move_files_to(dest_dir, type)
 			response[:msg] = "Success"
+      render json: response, status: 200
 		else
 			response[:msg] = "Fail"
+      render json: response, status: 402
 		end
-		render json: response
 	end
+
+  #Moves files of a given type from a source directory to destination
+  def move_folder
+    source_dir = Item.new(Path.new(params[:source_dir]))
+    dest_dir = Item.new(Path.new(params[:dest_dir]))
+
+    response = {}
+    response[:source_dir] = source_dir
+    response[:dest_dir] = dest_dir
+    if source_dir.move_to(dest_dir)
+      response[:msg] = "Success"
+      render json: response, status: 200
+    else
+      response[:msg] = "Fail"
+      render json: response, status: 402
+    end
+  end
 
 	# Returns file count of specific file type in given directory
 	def file_count

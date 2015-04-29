@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     get '/copy_files', to: 'items#copy_files'
     get '/move_files', to: 'items#move_files'
     get '/move_file', to: 'items#move_file'
+    get '/move_folder', to: 'items#move_folder'
     get '/list_files', to: 'items#list_files'
     get '/combine_pdf_files', to: 'items#combine_pdf_files'
     get '/file_count', to: 'items#file_count'

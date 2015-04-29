@@ -41,9 +41,9 @@ class Item
 		return true
 	end
 
-	# Copies file to destination file
+	# Moves file to destination file
 	def move_to(dest_file)
-		return false if !file_exist?
+		return false if !exist?
 		
 		return false if !dest_file.path.create_structure
 
