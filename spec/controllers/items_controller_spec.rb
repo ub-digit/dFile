@@ -13,14 +13,14 @@ describe ItemsController do
 	describe "GET copy_file" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				get :copy_file, source: "12", dest: "13", type: "txt", api_key: @api_key
+				get :copy_file, source_file: "12.txt", dest_file: "13.txt", api_key: @api_key
 				expect(json['msg'] == "Fail").to be true
 			end 
 		end
 		context "with valid attributes" do 
 			it "Copies a file successfully" do
 				create_file(@test_path + "testfile.txt")
-				get :copy_file, source: @test_path + "testfile", dest: @test_path + "copied", type: "txt", api_key: @api_key
+				get :copy_file, source_file: @test_path + "testfile.txt", dest_file: @test_path + "copied.txt", api_key: @api_key
 				expect(json['msg'] == "Success").to be true
         expect(response.status).to eq 200
 			end

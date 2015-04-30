@@ -59,8 +59,8 @@ class ItemsController < ApplicationController
 
 	#Copies a file as given destination file
 	def copy_file
-		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
-		dest_file = Item.new(Path.new(params[:dest]+"."+params[:type]))
+		source_file = Item.new(Path.new(params[:source_file]))
+		dest_file = Item.new(Path.new(params[:dest_file]))
 		response = {}
 		response[:source_file] = source_file
 		response[:dest_file] = dest_file
