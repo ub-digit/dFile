@@ -41,8 +41,6 @@ public/assets/
 # Ignore generated docs
 doc/app/
 
-#Ignore Gemfile.lock
-Gemfile.lock
 
 #Ignore nbproject
 nbproject/
