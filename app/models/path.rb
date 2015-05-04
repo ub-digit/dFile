@@ -10,7 +10,12 @@ class Path < Pathname
 		return super(input_path) if !input_path.index(":")
 		root,path = input_path.split(":")
 		rootpath = lookup_config_path(root)
-		super(rootpath+path)
+    root_pathname = Pathname.new(rootpath)
+		output_pathname = super(rootpath+path)
+    if output_pathname.relative_path_from(root_pathname).to_s[/^\.\./]
+      raise StandardError, "Requested path outside root path"
+    end
+    output_pathname
 	end
 
 	# Returns path from config based on key

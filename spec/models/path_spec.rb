@@ -13,6 +13,11 @@ describe Path do
 		path = Path.new("TEST:123")
 		expect(path).to be_a Path
 	end
+
+	it "should raise error if path is outside root" do
+		expect { Path.new("TEST:../../123") }.to raise_error(StandardError)
+	end
+
 	it "should work without prefix" do
 		path = Path.new(@test_path)
 		expect(path.to_s == @test_path).to be true
