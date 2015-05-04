@@ -15,6 +15,9 @@ class Path < Pathname
     if output_pathname.relative_path_from(root_pathname).to_s[/^\.\./]
       raise StandardError, "Requested path outside root path"
     end
+    if output_pathname.relative_path_from(root_pathname).to_s == "."
+      raise StandardError, "Requested path is root path. Must be subpath of root."
+    end
     output_pathname
 	end
 

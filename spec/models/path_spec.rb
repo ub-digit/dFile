@@ -18,6 +18,10 @@ describe Path do
 		expect { Path.new("TEST:../../123") }.to raise_error(StandardError)
 	end
 
+	it "should raise error if path is same as root" do
+		expect { Path.new("TEST:/") }.to raise_error(StandardError)
+	end
+
 	it "should work without prefix" do
 		path = Path.new(@test_path)
 		expect(path.to_s == @test_path).to be true
