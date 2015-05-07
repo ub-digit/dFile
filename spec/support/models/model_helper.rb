@@ -34,7 +34,7 @@ module ModelHelper
 	end
 
 	def create_folder_with_images(dir_path)
-		FileUtils.mkdir(dir_path)
+		FileUtils.mkdir_p(dir_path)
 		5.times do |x|
 			create_image(dir_path + "/test_file#{x}.jpg")
 		end

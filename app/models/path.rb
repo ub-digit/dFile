@@ -1,5 +1,7 @@
 class Path < Pathname
 
+  attr_accessor :input_root,:input_path
+
 	# WORK:/114/master/0001.tif
 	# root: WORK
 	# path: /114/master/0001.tif
@@ -9,6 +11,8 @@ class Path < Pathname
 		return super('') if input_path.nil?
 		return super(input_path) if !input_path.index(":")
 		root,path = input_path.split(":")
+    @input_root = root
+    @input_path = path
 		rootpath = lookup_config_path(root)
     root_pathname = Pathname.new(rootpath)
 		output_pathname = super(rootpath+path)
