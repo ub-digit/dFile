@@ -1,6 +1,7 @@
 Rails.application.config.dfile_paths = {
 	"PROCESSING" => "/path/to/processing/folder/",
 	"PACKAGING" => "/path/to/packaging/folder/",
-	"STORE" => "/path/to/store/folder/"
+	"STORE" => "/path/to/store/folder/",
+  "TRASH" => "/path/to/trash/folder/"
 }
 Rails.application.config.api_key = "test_key"

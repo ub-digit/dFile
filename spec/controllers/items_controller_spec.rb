@@ -8,6 +8,8 @@ describe ItemsController do
 	before :each do
     @api_key = Rails.application.config.api_key
 		@test_path = Rails.root.to_s + "/tmp/testdata/"
+    Rails.application.config.dfile_paths["TRASH"] = Rails.root.to_s + "/tmp/testdata/trash/"
+    Rails.application.config.dfile_paths["PACKAGING"] = Rails.root.to_s + "/tmp/testdata/packaging/"
 		initiate_test_environment(@test_path)
 	end
 	describe "GET copy_file" do 
@@ -39,7 +41,7 @@ describe ItemsController do
         create_file(@test_path + "createdFile.txt")
         post :create_file, dest_file: @test_path + 'createdFile.txt', content: "My content", api_key: @api_key
         expect(json['msg'] == "Fail").to be true
-        expect(response.status).to eq 402
+        expect(response.status).to eq 422
       end
     end
   end
@@ -231,4 +233,38 @@ describe ItemsController do
 			end
 		end
 	end
+
+  describe "GET move_to_trash" do
+    context "with valid folder that doesn't already exist in trash" do
+      it "should move folder to trash folder" do
+        source_dir = @test_path + "packaging/test_folder"
+        create_folder_with_images(source_dir)
+        get :move_to_trash, source_dir: "PACKAGING:test_folder", api_key: @api_key
+        expect(response.status).to eq 200
+      end
+    end
+
+    context "with an invalid folder" do
+      it "should return error message" do
+        source_dir = @test_path + "packaging/test_folder"
+
+        get :move_to_trash, source_dir: "PACKAGING:test_folder", api_key: @api_key
+        expect(response.status).to eq 422
+      end
+    end
+
+    context "with valid folder that already exist in trash" do
+      it "should move folder to trash folder" do
+        source_dir = @test_path + "packaging/test_folder"
+        create_folder_with_images(source_dir)
+        create_folder_with_images(@test_path + "/trash/test_folder")
+        create_folder_with_images(@test_path + "/trash/test_folder_1")
+        get :move_to_trash, source_dir: "PACKAGING:test_folder", api_key: @api_key
+        expect(response.status).to eq 200
+        expect(Item.new(Path.new(@test_path + "/trash/test_folder_1")).exist?).to be_truthy
+        expect(Item.new(Path.new(@test_path + "/trash/test_folder_2")).exist?).to be_truthy
+        expect(Item.new(Path.new(@test_path + "packaging/test_folder")).exist?).to be_falsey
+      end
+    end
+  end
 end

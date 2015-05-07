@@ -53,7 +53,7 @@ class ItemsController < ApplicationController
       render json: response, status: 200
     else
       response[:msg] = "Fail"
-      render json: response, status: 402
+      render json: response, status: 422
     end
   end
 
@@ -239,4 +239,32 @@ class ItemsController < ApplicationController
 		end
 		render json: response
 	end
+
+  # Moves source_dir to archive folder with suffix if folder exists
+  def move_to_trash
+    source_dir = Item.new(Path.new(params[:source_dir]))
+    dest_dir_root = Item.new(Path.new("TRASH:" + source_dir.path.input_path))
+
+    dest_dir_string = dest_dir_root.path.to_s
+    dir_found = false
+    i = 1
+    while(!dir_found)
+      dest_dir = Item.new(Path.new(dest_dir_string))
+      if dest_dir.exist?
+        dest_dir_string = dest_dir_root.path.to_s + "_#{i}"
+        i += 1
+      else
+        dir_found = true
+      end
+    end
+
+    response = {}
+    if source_dir.move_to(dest_dir)
+      response[:msg] = "Success"
+      render json: response, status: 200
+    else
+      response[:msg] = "Fail"
+      render json: response, status: 422
+    end
+  end
 end
