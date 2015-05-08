@@ -27,7 +27,11 @@ class Path < Pathname
 
 	# Returns path from config based on key
 	def lookup_config_path(key)
-		Rails.configuration.dfile_paths[key]
+		path = Rails.configuration.dfile_paths[key]
+    if !path
+      raise StandardError, "Requewted rootpath #{key} is not configured"
+    end
+    return path
 	end
 
 	# Returns all children of given filetype
