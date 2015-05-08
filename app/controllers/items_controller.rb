@@ -259,7 +259,10 @@ class ItemsController < ApplicationController
     end
 
     response = {}
-    if source_dir.move_to(dest_dir)
+    if !source_dir.exist?
+      response[:msg] = "No folder at location, nothing to do"
+      render json: response, status: 200
+    elsif source_dir.move_to(dest_dir)
       response[:msg] = "Success"
       render json: response, status: 200
     else
