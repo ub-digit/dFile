@@ -18,7 +18,7 @@ class Item
     if dir?
       @path.sort_files(@path.children).each do |child|
         if child.directory?
-          child = Pathname.new(child)
+          child = Path.new(child)
         end
         items << Item.new(child)
       end
@@ -149,7 +149,6 @@ class Item
     if dir?
       {
        name: @path.basename.to_s,
-       size: size,
        children: child_items
      }
    else
