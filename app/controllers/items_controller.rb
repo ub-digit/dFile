@@ -91,7 +91,12 @@ class ItemsController < ApplicationController
 	# Returns a list of all files in directory
 	def list_files
 		source_dir = Path.new(params[:source])
-		render json: source_dir.files(params[:ext])
+    if params.has_key?(:show_catalogues)
+      show_catalogues = params[:show_catalogues]
+    else
+      show_catalogues = false
+    end
+		render json: source_dir.files(params[:ext], show_catalogues)
 	end
 
 	# Combines pdf files within a source directory and stores them as a single file

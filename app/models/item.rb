@@ -12,12 +12,27 @@ class Item
 		end
 	end
 
+  # Returns all Items in current directory
+  def child_items
+    items = []
+    if dir?
+      @path.sort_files(@path.children).each do |child|
+        if child.directory?
+          child = Pathname.new(child)
+        end
+        items << Item.new(child)
+      end
+      return items
+    end
+    nil
+  end
+
 	# Returns checksum of file object
 	def checksum
 		@checksum ||= FileManager.checksum(@path)
-  #		if file?
-  #			return FileManager.checksum(@path)
-  #		end
+    #		if file?
+    #			return FileManager.checksum(@path)
+    #		end
   end
 
   def create(content)
@@ -131,10 +146,18 @@ class Item
 	end
 
 	def as_json(options={})
-		{
-			name: @path.basename.to_s,
-			size: size
-		}
-	end
+    if dir?
+      {
+       name: @path.basename.to_s,
+       size: size,
+       children: child_items
+     }
+   else
+    {
+      name: @path.basename.to_s,
+      size: size
+    }
+  end
+end
 
 end

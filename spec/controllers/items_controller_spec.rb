@@ -173,6 +173,20 @@ describe ItemsController do
         expect(json.size).to be 5
       end
     end
+
+    context "with catalogues allowed" do
+      it "returns a list of the entire folder structure" do
+        source_dir = @test_path + "text_files"
+        create_folder_with_files(source_dir)
+        create_folder_with_files(source_dir + '/nested_files')
+        source_item = Item.new(Path.new(@test_path + "text_files"))
+
+        get :list_files, source: source_dir, show_catalogues: true, api_key: @api_key
+
+        expect(json.size).to be 7
+        expect(json.find{|x| x["name"] == 'nested_files'}["children"].size).to be 6
+      end
+    end
 	end
 	describe "GET get_image" do 
 		context "with invalid attributes" do 
@@ -245,11 +259,11 @@ describe ItemsController do
     end
 
     context "with an invalid folder" do
-      it "should return error message" do
+      it "should not return error message" do
         source_dir = @test_path + "packaging/test_folder"
 
         get :move_to_trash, source_dir: "PACKAGING:test_folder", api_key: @api_key
-        expect(response.status).to eq 422
+        expect(response.status).to eq 200
       end
     end
 
