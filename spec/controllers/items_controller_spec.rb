@@ -144,7 +144,7 @@ describe ItemsController do
 	describe "GET list_files" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 
-				get :list_files, source: "12", type: "pdf", api_key: @api_key
+				get :list_files, source_dir: "12", type: "pdf", api_key: @api_key
 				expect(json.size).to be 0
 			end 
 		end
@@ -155,7 +155,7 @@ describe ItemsController do
 				create_folder_with_files(source_dir)
 				source_item = Item.new(Path.new(@test_path + "text_files"))
 				
-				get :list_files, source: source_dir, api_key: @api_key
+				get :list_files, source_dir: source_dir, api_key: @api_key
 				
 				expect(json.size).to be 6
 			end
@@ -168,7 +168,7 @@ describe ItemsController do
         create_folder_with_files(source_dir)
         source_item = Item.new(Path.new(@test_path + "text_files"))
         
-        get :list_files, source: source_dir, ext: 'txt', api_key: @api_key
+        get :list_files, source_dir: source_dir, ext: 'txt', api_key: @api_key
         
         expect(json.size).to be 5
       end
@@ -181,7 +181,7 @@ describe ItemsController do
         create_folder_with_files(source_dir + '/nested_files')
         source_item = Item.new(Path.new(@test_path + "text_files"))
 
-        get :list_files, source: source_dir, show_catalogues: true, api_key: @api_key
+        get :list_files, source_dir: source_dir, show_catalogues: true, api_key: @api_key
 
         expect(json.size).to be 7
         expect(json.find{|x| x["name"] == 'nested_files'}["children"].size).to be 6

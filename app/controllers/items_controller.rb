@@ -90,7 +90,7 @@ class ItemsController < ApplicationController
 
 	# Returns a list of all files in directory
 	def list_files
-		source_dir = Path.new(params[:source])
+		source_dir = Path.new(params[:source_dir])
     if params.has_key?(:show_catalogues)
       show_catalogues = params[:show_catalogues]
     else
