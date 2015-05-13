@@ -18,7 +18,7 @@ class Item
     if dir?
       @path.sort_files(@path.children).each do |child|
         if child.directory?
-          child = Path.new(child)
+          child = Path.new(child.to_s)
         end
         items << Item.new(child)
       end
