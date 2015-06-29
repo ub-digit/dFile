@@ -34,7 +34,6 @@ set :repo_url, 'git@github.com:ub-digit/dFile.git'
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-set :tmp_dir, '/home/rails/tmp'
 
 # Copied into /{app}/shared/config from respective sample file
 set :linked_files, %w{config/initializers/config.rb}
