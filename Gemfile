@@ -48,4 +48,5 @@ group :development do
   gem 'capistrano-rails', '~> 1.1'
   gem 'capistrano-passenger' #For passenger specific projects
   gem 'capistrano-bundler', '~> 1.1.2'
+  gem 'capistrano-rvm'
 end
