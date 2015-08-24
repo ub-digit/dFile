@@ -9,15 +9,23 @@ class FileManager
     FileUtils.mv(source_path, dest_path)
   end
 
-  def self.create(dest_path, content)
-    File.open(dest_path, "w:utf-8") do |file|
+  def self.create(dest_path, content, permission=nil)
+    file = File.open(dest_path, "w:utf-8") do |file|
       file.write(content)
     end
+    if permission.present?
+      FileUtils.chmod(permission.to_i(8), dest_path)
+    end
+
+    return file
   end
 
   # creates catalog structure for given path
-  def self.create_structure(path)
+  def self.create_structure(path, permission=nil)
     FileUtils.mkdir_p(path)
+    if permission.present?
+      FileUtils.chmod(permission.to_i(8), path)
+    end
     return true
   end
 

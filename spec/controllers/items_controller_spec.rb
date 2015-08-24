@@ -44,6 +44,16 @@ describe ItemsController do
         expect(response.status).to eq 422
       end
     end
+    context "With rights" do
+      it "should create file with proper rights" do
+        post :create_file, dest_file: @test_path + 'createdFile.txt', content: "My content", api_key: @api_key, force_permission: "0753"
+
+        permission = File.stat(@test_path + '/createdFile.txt').mode
+
+        expected = (permission&0xfff).to_s(8) #Translates mode output to octal permission setting
+        expect(expected).to eq "753"
+      end
+    end
   end
 	describe "GET copy_files" do 
 		context "with invalid attributes" do 

@@ -62,8 +62,8 @@ class Path < Pathname
 	end
 
 	# creates catalog structure for the path
-	def create_structure
-		FileManager.create_structure(self.dirname.to_s)
+	def create_structure(permission=nil)
+		FileManager.create_structure(self.dirname.to_s, permission)
 	end
 
 	# Sorts a list of files based on filename

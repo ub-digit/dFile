@@ -35,12 +35,12 @@ class Item
     #		end
   end
 
-  def create(content)
+  def create(content, permission=nil)
     return false if file_exist?
 
-    return false if !path.create_structure
+    return false if !path.create_structure(permission)
 
-    return false if !FileManager.create(@path,content)
+    return false if !FileManager.create(@path,content,permission)
 
     return true
   end

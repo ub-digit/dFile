@@ -48,7 +48,8 @@ class ItemsController < ApplicationController
     content = params[:content]
     response = {}
     response[:dest_file] = dest_file
-    if dest_file.create(content)
+    permission = params[:force_permission]
+    if dest_file.create(content, permission)
       response[:msg] = "Success"
       render json: response, status: 200
     else
