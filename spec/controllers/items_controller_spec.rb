@@ -11,7 +11,25 @@ describe ItemsController do
     Rails.application.config.dfile_paths["TRASH"] = Rails.root.to_s + "/tmp/testdata/trash/"
     Rails.application.config.dfile_paths["PACKAGING"] = Rails.root.to_s + "/tmp/testdata/packaging/"
 		initiate_test_environment(@test_path)
+    $redis.flushdb
 	end
+
+  describe "GET checksum" do
+    context "for an existing file" do
+      it "should return an id" do
+        create_file(@test_path + 'testfile.txt')
+        
+        get :checksum, source_file: @test_path + 'testfile.txt', api_key: @api_key
+
+        expect(json['id']).to_not be nil
+        
+        id = json['id']
+        redis_value = $redis.get("dFile:processes:#{json['id']}:state")
+        expect(redis_value).to eq "QUEUED"
+      end
+    end
+  end
+
 	describe "GET copy_file" do 
 		context "with invalid attributes" do 
 			it "returns a json message" do 

@@ -12,15 +12,29 @@ class ItemsController < ApplicationController
 			return
 		end
 
-		checksum = FileManager.checksum(source_file.path)
+    # Ask redis for id
+    redis = RedisInterface.new
+    id = redis.incr('dFile:id') 
 
-		if checksum
+    # Create work order item in redis for dFile
+    redis.set("dFile:processes:#{id}:state:queued", id)
+    redis.set("dFile:processes:#{id}:state", "QUEUED")
+    redis.set("dFile:processes:#{id}:process", "CHECKSUM")
+    redis.set("dFile:processes:#{id}:params", params.to_json)
+    redis.set("dFile:processes:#{id}:priority", "1")
+
+    # Start QueueManager
+    QueueManager.new.run
+
+		if id
 			response[:msg] = "Success"
-			response[:checksum] = checksum
+			response[:id] = id
+      render json: response, status: 200
 		else
 			response[:msg] = "Fail"
+      render json: response, status: 400
 		end
-		render json: response
+
 	end	
 
   # Returns a file, or information about a file

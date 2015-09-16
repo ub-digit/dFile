@@ -50,3 +50,5 @@ group :development do
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-rvm'
 end
+
+gem 'redis'
