@@ -5,6 +5,6 @@ development:
   db: 0
 test:
   db: 1
-production:
+lab:
   db: 2
   host: localhost
