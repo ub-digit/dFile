@@ -17,11 +17,13 @@ class ItemsController < ApplicationController
     id = redis.incr('dFile:id') 
 
     # Create work order item in redis for dFile
-    redis.set("dFile:processes:#{id}:state:queued", id)
-    redis.set("dFile:processes:#{id}:state", "QUEUED")
-    redis.set("dFile:processes:#{id}:process", "CHECKSUM")
-    redis.set("dFile:processes:#{id}:params", params.to_json)
-    redis.set("dFile:processes:#{id}:priority", "1")
+    redis.transaction do
+      redis.set("dFile:processes:#{id}:state:queued", id)
+      redis.set("dFile:processes:#{id}:state", "QUEUED")
+      redis.set("dFile:processes:#{id}:process", "CHECKSUM")
+      redis.set("dFile:processes:#{id}:params", params.to_json)
+      redis.set("dFile:processes:#{id}:priority", "1")
+    end
 
     # Start QueueManager
     QueueManager.new.run

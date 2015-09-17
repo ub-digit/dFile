@@ -35,6 +35,13 @@ class RedisInterface
     redis.flushdb
   end
 
+  # Encapsulate statements within a transaction
+  def transaction
+    redis.multi
+    yield
+    redis.exec
+  end
+
   # Returns a redis connection
   def connect
     $redis.client.reconnect
