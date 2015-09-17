@@ -8,53 +8,47 @@ class QueueManager
 
       redis = RedisInterface.new
 
-      # Check if process picking is locked
-      if redis.get("dFile:processes:locked") == 'true'
-        Process.exit!
-      end
+      redis.transaction do
 
-      # Check if there are any running processes
-      running_keys = redis.keys("dFile:processes:*:state:running")
-      if running_keys && running_keys.count >= MAXIMUM_PROCESSES
-        Process.exit!
-      end
+        # Check if there are any running processes
+        running_keys = redis.keys("dFile:processes:*:state:running")
+        if running_keys && running_keys.count >= MAXIMUM_PROCESSES
+          redis.discard
+          Process.exit!
+        end
 
-      # Lock queue picking from other processes
-      redis.set("dFile:processes:locked", 'true')
+        # Check if there are any queued processes
+        queued_keys = redis.keys("dFile:processes:*:state:queued")
+        if queued_keys.empty?
+          redis.discard
+          Process.exit!
+        end
 
-      # Check if there are any queued processes
-      queued_keys = redis.keys("dFile:processes:*:state:queued")
-      if queued_keys.empty?
-        redis.set("dFile:processes:locked", 'false')
-        Process.exit!
-      end
+        # Parse queued processes
+        queued_processes = []
+        queued_keys.each do |key|
+          process_id = redis.get(key)
+          process_object = {
+            id: process_id,
+            process: redis.get("dFile:processes:#{process_id}:process"),
+            params: JSON.parse(redis.get("dFile:processes:#{process_id}:params")),
+            priority: redis.get("dFile:processes:#{process_id}:priority")
+          }
+          queued_processes << process_object
 
-      # Parse queued processes
-      queued_processes = []
-      queued_keys.each do |key|
-        process_id = redis.get(key)
-        process_object = {
-          id: process_id,
-          process: redis.get("dFile:processes:#{process_id}:process"),
-          params: JSON.parse(redis.get("dFile:processes:#{process_id}:params")),
-          priority: redis.get("dFile:processes:#{process_id}:priority")
-        }
-        queued_processes << process_object
+        end
 
-      end
+        # Sort based on priority
+        queued_processes.sort! { |a,b| a[:priority] <=> b[:priority] }
 
-      # Sort based on priority
-      queued_processes.sort! { |a,b| a[:priority] <=> b[:priority] }
+        # Choose the first process to run
+        @process = queued_processes.first
 
-      # Choose the first process to run
-      @process = queued_processes.first
-      
-      # Remove queued key and create running key
-      redis.set("dFile:processes:#{@process[:id]}:state:running", @process[:id])
-      redis.del("dFile:processes:#{@process[:id]}:state:queued")
+        # Remove queued key and create running key
+        redis.set("dFile:processes:#{@process[:id]}:state:running", @process[:id])
+        redis.del("dFile:processes:#{@process[:id]}:state:queued")
 
-      # Unlock queue picking process
-      redis.set("dFile:processes:locked", 'false')
+      end #End redis transaction
 
       # Run the process
       case @process[:process]

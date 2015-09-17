@@ -42,6 +42,11 @@ class RedisInterface
     redis.exec
   end
 
+  # Stop and remove transaction
+  def discard
+    redis.discard
+  end
+
   # Returns a redis connection
   def connect
     $redis.client.reconnect
