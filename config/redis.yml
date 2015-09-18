@@ -8,3 +8,6 @@ test:
 lab:
   db: 2
   host: localhost
+production:
+  db: 2
+  host: localhost
