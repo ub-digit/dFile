@@ -3,20 +3,25 @@ class QueueManager
 
   def run
 
+    Rails.logger.info "Running queue manager"
     # Fork process to allow calling method to finish
     pid = fork do
+
+      Rails.logger.info "Created a new instance of queue manager (fork)"
 
       redis = RedisInterface.new
 
       # Check if there are any running processes
       running_keys = redis.keys("dFile:processes:*:state:running")
       if running_keys && running_keys.count >= MAXIMUM_PROCESSES
+        Rails.logger.info "There are already processes running: #{running_keys.to_json} , aborting!"
         Process.exit!
       end
 
       # Check if there are any queued processes
       queued_keys = redis.keys("dFile:processes:*:state:queued")
       if queued_keys.empty?
+        Rails.logger.info "There are no queued processes, aborting!"
         Process.exit!
       end
 
@@ -40,8 +45,11 @@ class QueueManager
       # Choose the first process to run
       @process = queued_processes.first
 
+      Rails.logger.info "Selected process for execution: #{@process.to_json}"
+
       # Make sure process is still queued
-      if redis.get("dFile:processes:#{@process['id']}:queued").nil?
+      if redis.get("dFile:processes:#{@process[:id]}:state:queued").nil?
+        Rails.logger.info "Process is no longer in queued state, aborting!"
         Process.exit!
       end
 
@@ -51,6 +59,8 @@ class QueueManager
         redis.del("dFile:processes:#{@process[:id]}:state:queued")
 
       end #End redis transaction
+
+      Rails.logger.info "Staring process #{@process[:process]} for id: #{@process[:id]}"
 
       # Run the process
       case @process[:process]
@@ -63,6 +73,8 @@ class QueueManager
       redis.set("dFile:processes:#{@process[:id]}:state:done", @process[:id])
       redis.set("dFile:processes:#{@process[:id]}:state", "DONE")
 
+      Rails.logger.info "########### Process done! ############"
+
       # Run QueueManager again to continue picking processes from queue
       QueueManager.new.run
     end
@@ -73,13 +85,22 @@ class QueueManager
     source_file = Item.new(Path.new(@process[:params]['source_file']))
     redis = RedisInterface.new
 
+    Rails.logger.info "CHECKSUM: Source file: #{source_file.path.to_s}"
+
     # If file does not exist, create error key and message
     if !source_file.path.exist?
+      Rails.logger.error "CHECKSUM: Source file #{source_file.path.to_s} does not exist!"
       redis.set(key_root + 'error', "CHECKSUM: Source file #{source_file.path.to_s} does not exist!")
+      redis.set(key_root + 'value', "error")
+      return
     end
 
-    checksum = FileManager.checksum(source_file.path)
-
-    redis.set(key_root + 'value', checksum)
+    begin
+      checksum = FileManager.checksum(source_file.path)
+      redis.set(key_root + 'value', checksum)
+    rescue StandardError => e
+      redis.set(key_root + 'value', "error")
+      redis.set(key_root + 'error', e.inspect)
+    end
   end
 end
