@@ -20,6 +20,11 @@ class RedisInterface
     redis.incr(key)
   end
 
+  # Decrement key
+  def decr(key)
+    redis.decr(key)
+  end
+
   # Returns keys
   def keys(query)
     redis.keys(query)

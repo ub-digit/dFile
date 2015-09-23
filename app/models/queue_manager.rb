@@ -3,20 +3,21 @@ class QueueManager
   MAXIMUM_FORKS = 5 # Sets maximum of concurrent forks allowed to start
 
   def run
-    @@forks ||= 0
-
-    if @@forks > MAXIMUM_FORKS
+    
+    redis = RedisInterface.new
+    forks_count = redis.get("dFile:forks") || 0
+    if forks_count > MAXIMUM_FORKS
+      Rails.logger.info "FORKS: Maximum number of allowed forks reached #{MAXIMUM_FORKS}, aborting!"
       return
     end
 
     Rails.logger.info "Running queue manager"
     # Fork process to allow calling method to finish
     pid = fork do
-
-    @@forks += 1
       Rails.logger.info "Created a new instance of queue manager (fork)"
 
       redis = RedisInterface.new
+      redis.incr("dFile:forks")
 
       # Check if there are any running processes
       running_keys = redis.keys("dFile:processes:*:state:running")
@@ -91,7 +92,8 @@ class QueueManager
 
   def exit_fork(state = :aborted)
     Rails.logger.info "FORK: Exiting process #{Process.pid} (#{state})"
-    @@forks -= 1
+    redis = RedisInterface.new
+    redis.decr("dFile:forks")
     Process.exit!
   end
 
