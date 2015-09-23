@@ -1,12 +1,19 @@
 class QueueManager
   MAXIMUM_PROCESSES = 1 # Sets maximum allowed processes at the same time
+  MAXIMUM_FORKS = 5 # Sets maximum of concurrent forks allowed to start
 
   def run
+    @@forks ||= 0
+
+    if @@forks > MAXIMUM_FORKS
+      return
+    end
 
     Rails.logger.info "Running queue manager"
     # Fork process to allow calling method to finish
     pid = fork do
 
+    @@forks += 1
       Rails.logger.info "Created a new instance of queue manager (fork)"
 
       redis = RedisInterface.new
@@ -15,14 +22,14 @@ class QueueManager
       running_keys = redis.keys("dFile:processes:*:state:running")
       if running_keys && running_keys.count >= MAXIMUM_PROCESSES
         Rails.logger.info "There are already processes running: #{running_keys.to_json} , aborting!"
-        Process.exit!
+        exit_fork
       end
 
       # Check if there are any queued processes
       queued_keys = redis.keys("dFile:processes:*:state:queued")
       if queued_keys.empty?
         Rails.logger.info "There are no queued processes, aborting!"
-        Process.exit!
+        exit_fork
       end
 
       # Parse queued processes
@@ -50,7 +57,7 @@ class QueueManager
       # Make sure process is still queued
       if redis.get("dFile:processes:#{@process[:id]}:state:queued").nil?
         Rails.logger.info "Process is no longer in queued state, aborting!"
-        Process.exit!
+        exit_fork
       end
 
       redis.transaction do
@@ -77,7 +84,15 @@ class QueueManager
 
       # Run QueueManager again to continue picking processes from queue
       QueueManager.new.run
+
+      exit_fork(:done)
     end
+  end
+
+  def exit_fork(state = :aborted)
+    Rails.logger.info "FORK: Exiting process #{Process.pid} (#{state})"
+    @@forks -= 1
+    Process.exit!
   end
 
   # Calcluates a checksum for given source_file and sets result key
