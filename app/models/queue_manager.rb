@@ -38,14 +38,24 @@ class QueueManager
       queued_processes = []
       queued_keys.each do |key|
         process_id = redis.get(key)
+
+        params = redis.get("dFile:processes:#{process_id}:params")
+        if params.nil?
+          wait 3
+          params = RedisInterface.new.get("dFile:processes:#{process_id}:params")
+        end
+        if params.nil?
+          Rails.logger.info "No parameters are set for #{process_id}, aborting!"
+          exit_fork
+        end
+
         process_object = {
           id: process_id,
           process: redis.get("dFile:processes:#{process_id}:process"),
-          params: JSON.parse(redis.get("dFile:processes:#{process_id}:params")),
+          params: JSON.parse(params),
           priority: redis.get("dFile:processes:#{process_id}:priority")
         }
         queued_processes << process_object
-
       end
 
       # Sort based on priority
