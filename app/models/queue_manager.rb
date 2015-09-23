@@ -13,7 +13,8 @@ class QueueManager
 
     Rails.logger.info "Running queue manager"
     # Fork process to allow calling method to finish
-    pid = fork do
+    pid = fork
+    if pid.nil?
       Rails.logger.info "Created a new instance of queue manager (fork)"
 
       redis = RedisInterface.new
@@ -87,8 +88,10 @@ class QueueManager
       QueueManager.new.run
 
       exit_fork(:done)
+    else
+      # Parent process
+      Process.detach(pid)
     end
-    Process.detach(pid)
   end
 
   def exit_fork(state = :aborted)
