@@ -88,6 +88,7 @@ class QueueManager
 
       exit_fork(:done)
     end
+    Process.detach(pid)
   end
 
   def exit_fork(state = :aborted)
