@@ -5,8 +5,8 @@ class QueueManager
   def run
     
     redis = RedisInterface.new
-    forks_count = redis.get("dFile:forks") || 0
-    if forks_count > MAXIMUM_FORKS
+    forks_count = redis.get("dFile:forks") || "0"
+    if forks_count.to_i > MAXIMUM_FORKS
       Rails.logger.info "FORKS: Maximum number of allowed forks reached #{MAXIMUM_FORKS}, aborting!"
       return
     end
