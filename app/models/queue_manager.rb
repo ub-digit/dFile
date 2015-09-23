@@ -41,7 +41,7 @@ class QueueManager
 
         params = redis.get("dFile:processes:#{process_id}:params")
         if params.nil?
-          wait 3
+          sleep 3
           params = RedisInterface.new.get("dFile:processes:#{process_id}:params")
         end
         if params.nil?
