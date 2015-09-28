@@ -276,6 +276,36 @@ describe ItemsController do
 		end
 	end
 
+  describe "GET thumbnail" do
+    context "for an existing thumbnail" do
+      it "should return a base 64 encoded thumbnail" do
+       source_dir = @test_path + "test_folder"
+       create_folder(source_dir + '/master')
+       create_folder(source_dir + '/thumbnails/master/700')
+       create_image(source_dir + "/master/0001.tif")
+       create_image(source_dir + "/thumbnails/master/700/0001.jpg")
+
+       get :thumbnail, source_dir: source_dir, source: 'master', size: '700', image: '0001', api_key: @api_key
+
+       expect(json['thumbnail']).to_not be nil
+       expect(response.status).to eq 200
+
+      end
+    end
+
+    context "for a non exisiting thumbnail" do
+      it "should return a generated base 64 encoded thumbnail" do
+       source_dir = @test_path + "test_folder"
+       create_folder(source_dir + '/master')
+       create_image(source_dir + '/master/0001.tif')
+       get :thumbnail, source_dir: source_dir, source: 'master', size: '700', image: '0001', api_key: @api_key
+
+       expect(json['thumbnail']).to_not be nil
+       expect(response.status).to eq 200
+      end
+    end
+  end
+
   describe "GET move_to_trash" do
     context "with valid folder that doesn't already exist in trash" do
       it "should move folder to trash folder" do

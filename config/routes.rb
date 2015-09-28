@@ -16,5 +16,6 @@ Rails.application.routes.draw do
     get '/copy_and_convert_image', to: 'items#copy_and_convert_image'
     get '/download_file', to: 'items#download_file', defaults: {format: :file}
     get 'move_to_trash', to: 'items#move_to_trash'
+    get 'thumbnail', to: 'items#thumbnail'
   end
 end

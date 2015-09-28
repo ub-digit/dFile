@@ -292,4 +292,51 @@ class ItemsController < ApplicationController
       render json: response, status: 422
     end
   end
+
+  # Returns a thumbnail file for a specified source with given size and source type
+  def thumbnail
+    source_dir = Item.new(Path.new(params[:source_dir]))
+    
+    response = {}
+    
+    # Check if source package folder exists
+    if !source_dir.exist?
+      response[:msg] = "No folder at location, nothing to do"
+      render json: response, status: 404
+      return
+    end
+
+    # Check if original file exists
+    original_file = Item.new(Path.new(source_dir.path.to_s + "/#{params[:source]}/#{params[:image]}.tif"))
+    
+    if !original_file.exist?
+      response[:msg] = "No original file at location #{original_file.path.to_s}, nothing to do"
+      render json: response, status: 404
+      return
+    end
+
+    # Check if thumnail file exists
+    thumbnail_file = Item.new(Path.new(source_dir.path.to_s + "/thumbnails/#{params[:source]}/#{params[:size]}/#{params[:image]}.jpg"))
+    
+    thumbnail_exists = false
+    if thumbnail_file.exist?
+      # check if original file is older than thumbnail, if so replace it
+      if File.mtime(original_file.path.to_s) < File.mtime(thumbnail_file.path.to_s)
+        thumbnail_exists = true
+        # Set thumbnail to return as existing
+      end
+    end
+
+    # If thumbnail doesn't exist or is old, generate it
+    if !thumbnail_exists
+      original_file.copy_and_convert_to(thumbnail_file, '50%', 'x700')
+    end
+
+    f = File.read(thumbnail_file.path.to_s)
+    # Return thumbnail response
+    response = {}
+    response[:thumbnail] = Base64.encode64(f)
+    render json: response, status: 200
+  end
+
 end

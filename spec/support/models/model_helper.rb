@@ -2,7 +2,7 @@ module ModelHelper
 	
 	# Creates folder for testing purposes
 	def create_folder(path)
-		FileUtils.mkdir(path)
+		FileUtils.mkdir_p(path)
 	end
 
 	# Deletes tes data folder
