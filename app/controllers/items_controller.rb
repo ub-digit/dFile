@@ -39,6 +39,46 @@ class ItemsController < ApplicationController
 
 	end	
 
+  def create_process(process:)
+    # Ask redis for id
+    redis = RedisInterface.new
+    id = redis.incr('dFile:id')
+
+
+    # Create process item 
+    redis.transaction do
+      redis.set("dFile:processes:#{id}:state:queued", id)
+      redis.set("dFile:processes:#{id}:state", "QUEUED")
+      redis.set("dFile:processes:#{id}:process", process)
+      redis.set("dFile:processes:#{id}:params", params.to_json)
+      redis.set("dFile:processes:#{id}:priority", "1")
+    end
+
+    
+    QueueManager.new.run
+
+    response = {}
+    if id
+      response[:msg] = "Success"
+      response[:id] = id
+      render json: response, status: 200
+    else
+      response[:msg] = "Fail"
+      render json: response, status: 400
+    end
+    
+  end
+
+  # Moves a source_dir to dest_dir file by file
+  def move_folder_ind
+    create_process(process: "MOVE_FOLDER")
+  end
+
+  # Copies a source_dir to dest_dir file by file
+  def copy_folder_ind
+    create_process(process: "COPY_FOLDER")
+  end
+
   # Returns a file, or information about a file
   def download_file
     source_file = Item.new(Path.new(params[:source_file]))

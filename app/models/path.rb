@@ -1,3 +1,5 @@
+require 'free_disk_space'
+
 class Path < Pathname
 
   attr_accessor :input_root,:input_path
@@ -35,13 +37,16 @@ class Path < Pathname
 	end
 
 	# Returns all children of given filetype
-	def files(file_type = nil, show_catalogues = false)
+	def files(file_type: nil, show_catalogues: true)
 		return [] if !directory?
 		items = []
 		sort_files(children).each do |child|
 			next if !child.file? && !show_catalogues
-			next if file_type && child.extname != ".#{file_type}" && !show_catalogues
-			items << Item.new(child)
+			next if file_type && child.extname != ".#{file_type}" && !child.directory?
+			items << Item.new(Path.new(child.to_s))
+      if child.directory? && show_catalogues
+        items += child.files(file_type: file_type, show_catalogues: show_catalogues)
+      end
 		end
 		items
 	end
@@ -56,10 +61,34 @@ class Path < Pathname
 		return file_list
 	end
 
-	def file_count(type)
+	def file_count(type: nil, show_catalogues: true)
 		return nil if !exist? || !directory?
-		return files(type).size
+		return files(file_type: type, show_catalogues: show_catalogues).size
 	end
+
+  def total_size
+    size = 0
+    self.all_files.each do |file|
+      begin
+        size += file.size
+      rescue StandardError => e
+        Rails.logger.info "Couldn't read size from file #{file}"
+      end
+    end
+    return size / 1024 / 1024 # Returns size in MB
+  end
+
+  def all_files
+    return @all_files if @all_files.present?
+    @all_files = []
+    children.each do |child|
+      @all_files << child
+      if child.directory?
+        @all_files += Path.new(child.to_s).all_files
+      end
+    end
+    return @all_files
+  end
 
 	# creates catalog structure for the path
 	def create_structure(permission=nil)

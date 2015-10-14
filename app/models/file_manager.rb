@@ -1,8 +1,14 @@
 class FileManager
-  # Copies file to destination path 
+  
+  # Copies source path to destination path 
   def self.copy(source_path, dest_path)
     FileUtils.cp(source_path, dest_path)
     return true
+  end
+
+  # Removes source directory
+  def self.delete_directory(path)
+    FileUtils.rm_rf(path)
   end
 
   def self.move(source_path, dest_path)

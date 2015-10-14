@@ -52,3 +52,5 @@ group :development do
 end
 
 gem 'redis'
+
+gem 'free_disk_space'

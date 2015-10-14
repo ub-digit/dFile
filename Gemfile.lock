@@ -47,6 +47,9 @@ GEM
     colorize (0.7.7)
     diff-lcs (1.2.5)
     erubis (2.7.0)
+    ffi (1.9.10)
+    free_disk_space (1.0.0)
+      sys-filesystem
     i18n (0.7.0)
     json (1.8.2)
     mail (2.5.4)
@@ -105,6 +108,8 @@ GEM
       colorize (>= 0.7.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    sys-filesystem (1.1.4)
+      ffi
     thor (0.19.1)
     thread_safe (0.3.5)
     treetop (1.4.15)
@@ -122,6 +127,7 @@ DEPENDENCIES
   capistrano-passenger
   capistrano-rails (~> 1.1)
   capistrano-rvm
+  free_disk_space
   rails (= 4.1.4)
   redis
   rspec-rails (~> 3.0.0)
