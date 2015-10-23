@@ -1,4 +1,6 @@
 require 'free_disk_space'
+require 'nokogiri'
+
 class QueueManager
   MAXIMUM_PROCESSES = 1 # Sets maximum allowed processes at the same time
   MAXIMUM_FORKS = 5 # Sets maximum of concurrent forks allowed to start
@@ -95,6 +97,8 @@ class QueueManager
           copy_folder(delete_source: true)
         when "COPY_FOLDER"
           copy_folder(delete_source: false)
+        when "OCR_FOLDER"
+          ocr_folder
         end
 
         # Set state to done
@@ -192,6 +196,59 @@ class QueueManager
       @redis.set(@key_root + 'value', 'error')
       @redis.set(@key_root + 'error', e.inspect)
     end
+  end
+
+  # Creates ticket for input folder files and copies files to ocr folder
+  def ocr_folder
+    @process_name = "OCR_FOLDER"
+
+    ocr_path = Path.new(Rails.application.config.ocr_path)
+    source_dir = Item.new(Path.new(@process[:params]['source_dir']))
+    dest_dir = Item.new(Path.new(@process[:params]['dest_dir']))
+    formats = @process[:params]['formats'] || [{type: 'PDF'}]
+    languages = @process[:params]['languages'] || ["English", "Swedish"]
+    documentSeparationMethod = @process[:params]['documentSeparationMethod'] || "OneFilePerImage"
+    deskew = @process[:params]['deskew'] || "True"
+    
+    images = source_dir.path.files_as_array
+    # Create ticket
+    builder = Nokogiri::XML::Builder.new do |xml|
+      xml.XmlTicket(:priority => "high") {
+        images.each do |image|
+          xml.InputFile(:Name => image )
+        end
+        xml.ImageProcessingParams(:Deskew => deskew, :RemoveTexture => "false", :SplitDualPages => "false", :ConvertToBWFormat => "false", :RotationType => "NoRotation")
+        xml.RecognitionParams(:RecognitionQuality => "Thorough", :LookForBarcodes => "false", :VerificationMode => "NoVerification", :RecognitionMode => "FullPage") {
+          xml.TextType "Normal"
+          languages.each do |language|
+            xml.Language language
+          end
+        }
+        xml.ExportParams(:DocumentSeparationMethod => documentSeparationMethod, :DeleteBlankPages => "false", :XMLResultPublishingMethod => "XMLResultToFolder") {
+          formats.each do |format|
+            if format['type'] == "PDF"
+              # Set up default values
+              pictureFormat = format['pictureFormat'] || "JpegColor"
+              quality = format['quality'] || "60"
+              pictureResolution = format['pictureResolution'] || "200"
+              xml.ExportFormat(:OutputFileFormat => "PDF", :KeepLastModifiedDate => "false", :OutputFlowType => "SharedFolder", :ExportMode => "ImageOnText", :WriteTaggedPdf => "true", :PictureFormat => pictureFormat, :Quality => quality, :PictureResolution => pictureResolution, :UseExplicitDocumentInfo => "false", :UseOriginalPaperSize => "true", :KeepOriginalHeadersFooters => "false", :WriteAnnotations => "false", :PdfVersion => "Auto", :UseImprovedConversion => "false") {
+                xml.OutPutLocation dest_dir.path.to_s + '/' + @process[:id]
+                xml.NamingRule "<FileName>.<Ext>"
+              }
+            end
+          end
+        }
+      }
+    end
+    puts builder.to_xml
+
+    # Send ticket to OCR-path
+    ticket_file = Item.new(Path.new(ocr_path.to_s + "/#{@process[:id]}.xml"))
+    ticket_file.create(builder.to_xml)
+
+    # Copy files to OCR-path
+
+    
   end
 
   def error_msg(msg)

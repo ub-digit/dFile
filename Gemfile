@@ -39,6 +39,9 @@ gem 'sqlite3'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+# XML gem for generating xml files
+gem 'nokogiri'
+
 group :development, :test do
   gem 'rspec-rails', '~> 3.0.0'
 end
