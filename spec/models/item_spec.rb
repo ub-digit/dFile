@@ -47,7 +47,7 @@ describe Item do
 
 		source_item.copy_files_to(dest_item,'txt')
 
-		expect(dest_item.path.files('txt').size == source_item.path.files('txt').size).to be true
+		expect(dest_item.path.files(file_type: 'txt').size == source_item.path.files(file_type: 'txt').size).to be true
 	end
 	it "should move a file successfully" do
 		source_file = create_file(@test_path + "testfile.txt")
@@ -69,11 +69,11 @@ describe Item do
 
 		dest_item = Item.new(Path.new(@test_path + "copy/copyfolder"))
 
-		source_size = source_item.path.file_count('txt')
+		source_size = source_item.path.file_count(file_type: 'txt')
 		source_item.move_files_to(dest_item,'txt')
 
-		expect(dest_item.path.files('txt').size == source_size).to be true
-		expect(source_item.path.file_count('txt')).to be 0
+		expect(dest_item.path.files(file_type: 'txt').size == source_size).to be true
+		expect(source_item.path.file_count(file_type: 'txt')).to be 0
 	end
 	it "should copy and convert an image successfully" do
 		source_file = @test_path + "testfile.tif"
@@ -96,6 +96,6 @@ describe Item do
 
 		source_item.copy_and_convert_files_to(dest_item,'jpg', 'jpg', 50, 25)
 
-		expect(dest_item.path.files('jpg').size == source_item.path.files('jpg').size).to be true
+		expect(dest_item.path.files(file_type: 'jpg').size == source_item.path.files(file_type: 'jpg').size).to be true
 	end
 end

@@ -29,6 +29,6 @@ describe Path do
 	it "should return list of files" do
 		create_folder_with_files(@test_path + "testfolder")
 		path = Path.new(@test_path + "testfolder")
-		expect(path.files('txt').size).to be 5
+		expect(path.files(file_type: 'txt').size).to be 5
 	end
 end

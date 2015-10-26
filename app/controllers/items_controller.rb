@@ -153,7 +153,7 @@ class ItemsController < ApplicationController
     else
       show_catalogues = false
     end
-		render json: source_dir.files(params[:ext], show_catalogues)
+		render json: source_dir.files(file_type: params[:ext], show_catalogues: show_catalogues)
 	end
 
 	# Combines pdf files within a source directory and stores them as a single file
@@ -241,7 +241,7 @@ class ItemsController < ApplicationController
 
 		response = {}
 		response[:source_dir] = source_dir
-		file_count = source_dir.path.file_count(type)
+		file_count = source_dir.path.file_count(file_type: type)
 		
 		if file_count
 			response[:msg] = "Success"

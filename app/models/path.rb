@@ -53,7 +53,7 @@ class Path < Pathname
 
 	# Returns all children of given filetype as an array
 	def files_as_array(file_type = nil)
-		items = files(file_type)
+		items = files(file_type: file_type)
 		file_list = []
 		items.each do |item|
 			file_list << item.path.to_s
@@ -61,9 +61,9 @@ class Path < Pathname
 		return file_list
 	end
 
-	def file_count(type: nil, show_catalogues: true)
+	def file_count(file_type: nil, show_catalogues: true)
 		return nil if !exist? || !directory?
-		return files(file_type: type, show_catalogues: show_catalogues).size
+		return files(file_type: file_type, show_catalogues: show_catalogues).size
 	end
 
   def total_size

@@ -71,7 +71,7 @@ class Item
 	def copy_files_to(dest_dir, type)
 		return false if !dir?
 
-		files = @path.files(type)
+		files = @path.files(file_type: type)
 		files.each do |source_file|
 			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.path.basename}"))
 			return false if !source_file.copy_to(dest_file)
@@ -84,7 +84,7 @@ class Item
 	def move_files_to(dest_dir, type)
 		return false if !dir?
 
-		files = @path.files(type)
+		files = @path.files(file_type: type)
 		files.each do |source_file|
 			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.path.basename}"))
 			return false if !source_file.move_to(dest_file)
@@ -108,7 +108,7 @@ class Item
 	def copy_and_convert_files_to(dest_dir, source_type, dest_type = nil, quality = nil, size = nil)
 		return false if !dir?
 		dest_file_type = dest_type || source_type
-		files = @path.files(source_type)
+		files = @path.files(file_type: source_type)
 		files.each do |source_file|
 			dest_file = Item.new(Path.new("#{dest_dir.path}/#{source_file.filename}.#{dest_file_type}"))
 			return false if !source_file.copy_and_convert_to(dest_file, quality, size)

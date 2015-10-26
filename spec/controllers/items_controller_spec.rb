@@ -164,7 +164,7 @@ describe ItemsController do
 				
 				get :file_count, source: source_dir, type: "txt", api_key: @api_key
 				
-				expect(json['file_count'] == source_item.path.file_count("txt")).to be true
+				expect(json['file_count'] == source_item.path.file_count(file_type: "txt")).to be true
 				expect(json['msg'] == "Success").to be true
 			end
 		end
@@ -211,7 +211,7 @@ describe ItemsController do
 
         get :list_files, source_dir: source_dir, show_catalogues: true, api_key: @api_key
 
-        expect(json.size).to be 7
+        expect(json.size).to be 13
         expect(json.find{|x| x["name"] == 'nested_files'}["children"].size).to be 6
       end
     end

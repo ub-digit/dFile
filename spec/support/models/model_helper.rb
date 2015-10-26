@@ -13,7 +13,7 @@ module ModelHelper
 	def initiate_test_environment(test_path)
 		Rails.configuration.dfile_paths["TEST"]	= test_path
 		if Pathname.new(test_path).exist?
-			FileUtils.rm_r(test_path) # Delete exisiting test path
+		  FileUtils.rm_r(test_path) # Delete exisiting test path
 		end
 		FileUtils.mkdir(test_path) # Create new test folder
 	end

@@ -89,16 +89,16 @@ class QueueManager
         Rails.logger.info "Staring process #{@process[:process]} for id: #{@process[:id]}"
 
         # Run the process
-        @key_root = "dFile:processes:#{@process[:id]}:"
         case @process[:process]
         when "CHECKSUM"
-          checksum
+          checksum(process_id: @process[:id], source_file: @process[:params]['source_file'])
         when "MOVE_FOLDER"
-          copy_folder(delete_source: true)
+          copy_folder(delete_source: true, process_id: @process[:id], source_dir: @process[:params]['source_dir'], dest_dir: @process[:params]['dest_dir'])
         when "COPY_FOLDER"
-          copy_folder(delete_source: false)
+          copy_folder(delete_source: false, process_id: @process[:id], source_dir: @process[:params]['source_dir'], dest_dir: @process[:params]['dest_dir'])
         when "OCR_FOLDER"
-          ocr_folder
+          ocr_folder(process_id: @process[:id], source_dir: @process[:params]['source_dir'], dest_dir: @process[:params]['dest_dir'], formats: @process[:params]['dest_dir'], languages: @process[:params]['languages'], documentSeparationMethod: @process[:params]['documentSeparationMethod'], deskew: @process[:params]['deskew'])
+
         end
 
         # Set state to done
@@ -119,15 +119,17 @@ class QueueManager
 
   def exit_fork(state = :aborted)
     Rails.logger.info "FORK: Exiting process #{Process.pid} (#{state})"
-    #redis = RedisInterface.new
-    @redis.decr("dFile:forks")
+    redis = RedisInterface.new
+    redis.decr("dFile:forks")
     Process.exit!
   end
 
   # Calcluates a checksum for given source_file and sets result key
-  def checksum
+  def checksum(process_id:, source_file:)
     @process_name = "CHECKSUM"
-    source_file = Item.new(Path.new(@process[:params]['source_file']))
+    @key_root ||= "dFile:processes:#{process_id}:"
+    @redis ||= RedisInterface.new
+    source_file = Item.new(Path.new(source_file))
     Rails.logger.info "CHECKSUM: Source file: #{source_file.path.to_s}"
 
     # If file does not exist, create error key and message
@@ -146,10 +148,12 @@ class QueueManager
   end
 
   # Moves given source_folder to dest_folder
-  def copy_folder(delete_source: false)
+  def copy_folder(delete_source: false, process_id:, source_dir:, dest_dir:)
     @process_name = "MOVE_FOLDER"
-    source_dir = Item.new(Path.new(@process[:params]['source_dir']))
-    dest_dir = Item.new(Path.new(@process[:params]['dest_dir']))
+    @key_root ||= "dFile:processes:#{process_id}:"
+    @redis ||= RedisInterface.new
+    source_dir = Item.new(Path.new(source_dir))
+    dest_dir = Item.new(Path.new(dest_dir))
 
     Rails.logger.info "MOVE_FOLDER #{source_dir.path.to_s} to #{dest_dir.path.to_s}"
 
@@ -199,16 +203,20 @@ class QueueManager
   end
 
   # Creates ticket for input folder files and copies files to ocr folder
-  def ocr_folder
+  def ocr_folder(process_id:, source_dir:, dest_dir:, formats: nil, languages: nil, documentSeparationMethod: nil, deskew: nil)
     @process_name = "OCR_FOLDER"
+    @key_root = "dFile:processes:#{process_id}:"
+    @redis ||= RedisInterface.new
+
+    Rails.logger.info("OCR for folder #{source_dir}")
 
     ocr_path = Path.new(Rails.application.config.ocr_path)
-    source_dir = Item.new(Path.new(@process[:params]['source_dir']))
-    dest_dir = Item.new(Path.new(@process[:params]['dest_dir']))
-    formats = @process[:params]['formats'] || [{type: 'PDF'}]
-    languages = @process[:params]['languages'] || ["English", "Swedish"]
-    documentSeparationMethod = @process[:params]['documentSeparationMethod'] || "OneFilePerImage"
-    deskew = @process[:params]['deskew'] || "True"
+    source_dir = Item.new(Path.new(source_dir))
+    dest_dir = Item.new(Path.new(dest_dir))
+    formats = formats || [{type: 'PDF'}]
+    languages = languages || ["English", "Swedish"]
+    documentSeparationMethod = documentSeparationMethod || "OneFilePerImage"
+    deskew = deskew || "True"
     
     images = source_dir.path.files_as_array
     # Create ticket
@@ -232,7 +240,7 @@ class QueueManager
               quality = format['quality'] || "60"
               pictureResolution = format['pictureResolution'] || "200"
               xml.ExportFormat(:OutputFileFormat => "PDF", :KeepLastModifiedDate => "false", :OutputFlowType => "SharedFolder", :ExportMode => "ImageOnText", :WriteTaggedPdf => "true", :PictureFormat => pictureFormat, :Quality => quality, :PictureResolution => pictureResolution, :UseExplicitDocumentInfo => "false", :UseOriginalPaperSize => "true", :KeepOriginalHeadersFooters => "false", :WriteAnnotations => "false", :PdfVersion => "Auto", :UseImprovedConversion => "false") {
-                xml.OutPutLocation dest_dir.path.to_s + '/' + @process[:id]
+                xml.OutPutLocation dest_dir.path.to_s + '/' + process_id
                 xml.NamingRule "<FileName>.<Ext>"
               }
             end
@@ -243,12 +251,13 @@ class QueueManager
     puts builder.to_xml
 
     # Send ticket to OCR-path
-    ticket_file = Item.new(Path.new(ocr_path.to_s + "/#{@process[:id]}.xml"))
+    ticket_file = Item.new(Path.new(ocr_path.to_s + "/#{process_id}.xml"))
     ticket_file.create(builder.to_xml)
+    Rails.logger.info("Ticket created #{ticket_file.path.to_s}")
 
     # Copy files to OCR-path
-
-    
+    copy_folder(process_id: process_id, delete_source: false, source_dir: source_dir.path.to_s, dest_dir: ocr_path.to_s + "/#{process_id}")
+    Rails.logger.info("Files copied to OCR-path")
   end
 
   def error_msg(msg)
