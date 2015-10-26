@@ -37,14 +37,14 @@ class Path < Pathname
 	end
 
 	# Returns all children of given filetype
-	def files(file_type: nil, show_catalogues: true)
+	def files(file_type: nil, show_catalogues: true, nested_files: false)
 		return [] if !directory?
 		items = []
 		sort_files(children).each do |child|
 			next if !child.file? && !show_catalogues
 			next if file_type && child.extname != ".#{file_type}" && !child.directory?
 			items << Item.new(Path.new(child.to_s))
-      if child.directory? && show_catalogues
+      if child.directory? && nested_files
         items += child.files(file_type: file_type, show_catalogues: show_catalogues)
       end
 		end

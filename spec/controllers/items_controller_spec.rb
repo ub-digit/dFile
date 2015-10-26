@@ -211,7 +211,7 @@ describe ItemsController do
 
         get :list_files, source_dir: source_dir, show_catalogues: true, api_key: @api_key
 
-        expect(json.size).to be 13
+        expect(json.size).to be 7
         expect(json.find{|x| x["name"] == 'nested_files'}["children"].size).to be 6
       end
     end
