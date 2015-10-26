@@ -4,7 +4,7 @@ lock '3.4.0'
 set :application, 'dFile'
 set :repo_url, 'https://github.com/ub-digit/dFile.git'
 
-set :rvm_ruby_string, :local              # use the same ruby as used locally for deployment
+set :rvm_ruby_version, '2.1.5'      # Defaults to: 'default'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
