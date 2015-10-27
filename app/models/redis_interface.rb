@@ -1,28 +1,29 @@
 class RedisInterface
-  attr_accessor :redis
+  attr_accessor :redis,:prefix
  
-  def initialize
+  def initialize(prefix: "")
+    @prefix = prefix
     connect
   end
 
   # Sets value for given key
   def set(key, value)
-    redis.set(key, value)
+    redis.set("#{@prefix}#{key}", value)
   end
 
   # Returns value for given key
   def get(key)
-    redis.get(key)
+    redis.get("#{@prefix}#{key}")
   end
 
   # Increment key
   def incr(key)
-    redis.incr(key)
+    redis.incr("#{@prefix}#{key}")
   end
 
   # Decrement key
   def decr(key)
-    redis.decr(key)
+    redis.decr("#{@prefix}#{key}")
   end
 
   # Returns keys
@@ -32,7 +33,7 @@ class RedisInterface
 
   # Delete specific key
   def del(key)
-    redis.del(key)
+    redis.del("#{@prefix}#{key}")
   end
 
   # Drop all db contents
