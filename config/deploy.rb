@@ -38,7 +38,7 @@ set :rvm_ruby_version, '2.1.5'      # Defaults to: 'default'
 
 
 # Copied into /{app}/shared/config from respective sample file
-set :linked_files, %w{config/initializers/config.rb}
+set :linked_files, %w{config/initializers/config.rb config/redis.yml}
 
 namespace :deploy do
 
