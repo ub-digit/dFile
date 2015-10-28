@@ -83,7 +83,7 @@ class QueueManager
 
         redis.transaction do
           # Remove queued key and create running key
-          process.redis.set("state:running", process[:id])
+          process.redis.set("state:running", process.id)
           process.redis.del("state:queued")
 
         end #End redis transaction
@@ -91,7 +91,7 @@ class QueueManager
         Rails.logger.info "Starting process #{process.name} for id: #{process.id}"
 
         # Run the process
-        case process[:process]
+        case process.name
         when "CHECKSUM"
           checksum(process: process, source_file: process.params['source_file'])
         when "MOVE_FOLDER"
@@ -266,7 +266,7 @@ class QueueManager
 
       # Set state to done
       redis.del("state:running")
-      redis.set("state:done", process[:id])
+      redis.set("state:done", @id)
       redis.set("state", "DONE")
 
       Rails.logger.info "########### Process done! ############"
