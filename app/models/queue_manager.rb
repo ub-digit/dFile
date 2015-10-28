@@ -279,7 +279,7 @@ class QueueManager
     end
 
     def redis
-      @redis ||= RedisInterface.new(prefix: "dFile:process:#{id}:")
+      @redis ||= RedisInterface.new(prefix: "dFile:processes:#{id}:")
     end
   end
 end
