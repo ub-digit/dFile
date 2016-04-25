@@ -1,5 +1,6 @@
 class RedisInterface
   attr_accessor :redis,:prefix
+  TIMEOUT_SECONDS = 1.week
  
   def initialize(prefix: "")
     @prefix = prefix
@@ -7,8 +8,11 @@ class RedisInterface
   end
 
   # Sets value for given key
-  def set(key, value)
+  def set(key, value, expire = true)
     redis.set("#{@prefix}#{key}", value)
+    if expire
+      redis.expire("#{@prefix}#{key}", TIMEOUT_SECONDS)
+    end
   end
 
   # Returns value for given key
