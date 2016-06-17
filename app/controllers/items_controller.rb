@@ -123,10 +123,12 @@ class ItemsController < ApplicationController
 		response[:dest_file] = dest_file
 		if source_file.copy_to(dest_file)
 			response[:msg] = "Success"
+      render json: response, status: 200
 		else
 			response[:msg] = "Fail"
+      response[:error] = "Copy failed" 
+      render json: response, status: 422
 		end
-		render json: response
 	end
 
 	# Copies files of a given type from a source directory to destination

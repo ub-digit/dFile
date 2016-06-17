@@ -52,8 +52,7 @@ class FileManager
   end
 
   # Copies file to destination path 
-  def self.copy_and_convert(source_path, dest_path, quality = nil, size = nil)
-    arguments = ""
+  def self.copy_and_convert(source_path:, dest_path:, quality: nil, size: nil, arguments: "")
     if quality then arguments += "-quality #{quality} " end
     if size then arguments += "-resize #{size} " end
     args = ["convert", source_path.to_s] + arguments.split(/\s+/) + [dest_path.to_s]

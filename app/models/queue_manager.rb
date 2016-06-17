@@ -146,6 +146,7 @@ class QueueManager
 
   # Moves given source_folder to dest_folder
   def copy_folder(process:, delete_source: false, source_dir:, dest_dir:)
+    start_time = Time.now
     source_dir = Item.new(Path.new(source_dir))
     dest_dir = Item.new(Path.new(dest_dir))
 
@@ -181,14 +182,19 @@ class QueueManager
         FileManager.copy(source_file, dest_file)
       end
 
+      end_time = Time.now
+      total_time = end_time - start_time
+
       if delete_source
         # Remove folder from source_dir
         redis.set('progress', value: "Deleting source folder after copy #{source_dir.path.to_s}, Total size: #{folder_size}")
         FileManager.delete_directory(source_dir.path)
+        process.redis.set('progress', "Moved #{source_dir} to #{dest_dir} in #{total_time.to_i}s")
+      else
+        process.redis.set('progress', "Copied #{source_dir} to #{dest_dir} in #{total_time.to_i}s")
       end
 
 
-      process.redis.set('progress', 'done')
       process.redis.set('value', dest_dir.path.to_s)
     rescue StandardError => e
       process.redis.set('value', 'error')
