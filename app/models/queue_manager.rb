@@ -100,6 +100,8 @@ class QueueManager
           copy_folder(delete_source: false, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'])
         when "OCR_FOLDER"
           ocr_folder(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], formats: process.params['dest_dir'], languages: process.params['languages'], documentSeparationMethod: process.params['documentSeparationMethod'], deskew: process.params['deskew'])
+        when "CONVERT_IMAGES"
+          convert_images(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format_params: process.params['format_params'], to_filetype: process.params['to_filetype'])
 
         end
 
@@ -124,6 +126,56 @@ class QueueManager
     @redis ||= RedisInterface.new
   end
 
+  def convert_images(process:, source_dir:, dest_dir:, format_params:, to_filetype:)
+    begin
+      start_time = Time.now
+      source_dir = Item.new(Path.new(source_dir))
+      dest_dir = Item.new(Path.new(dest_dir))
+
+      Rails.logger.info "CONVERT_IMAGES #{source_dir.path.to_s} to #{dest_dir.path.to_s} with params #{format_params}"
+
+      # Make sure source dir exist
+      if !source_dir.exist? || !source_dir.dir?
+        process.error_msg("Source directory #{source_dir.path.to_s} does not exist")
+        return
+      end
+
+      # Make sure dest_dir doesn't exist
+      if dest_dir.exist?
+        process.error_msg("Destination directory #{dest_dir.path.to_s} already exists")
+        return
+      end
+
+      # Make sure dest dir has enough free space
+      #free_disk_space = FreeDiskSpace.gigabytes(dest_dir.path.to_s)
+      #if free_disk_space < MINIMUM_FREE_DISK_SPACE
+      #  process.error_msg("Destination directory does not have enough disk space: #{free_disk_space.to_i}GB, required: #{MINIMUM_FREE_DISK_SPACE}GB")
+      #  return
+      #end
+
+      # Convert image files in source dir
+      FileManager.create_structure(dest_dir.path.to_s)
+      number_of_files = source_dir.path.all_files.count
+      folder_size = source_dir.path.total_size
+      source_dir.path.files(show_catalogues: false).each_with_index do |source_file, index|
+        process.redis.set('progress', "Converting file #{index+1}/#{number_of_files}, #{source_file.basename}, Total size: #{folder_size}")
+        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{source_file.filename}.#{to_filetype}")
+        FileManager.copy_and_convert(source_path: source_file, dest_path: dest_file, arguments: format_params)
+      end
+
+      end_time = Time.now
+      total_time = end_time - start_time
+
+      process.redis.set('progress', "Converted #{source_dir} to #{dest_dir} in #{total_time.to_i}s")
+
+      process.redis.set('value', dest_dir.path.to_s)
+    rescue StandardError => e
+      process.redis.del("state:running")
+      process.redis.set('value', 'error')
+      process.redis.set('error', e.inspect)
+    end
+  end
+
   # Calcluates a checksum for given source_file and sets result key
   def checksum(process:, source_file:)
     source_file = Item.new(Path.new(source_file))
@@ -139,6 +191,7 @@ class QueueManager
       checksum = FileManager.checksum(source_file.path)
       process.redis.set('value', checksum)
     rescue StandardError => e
+      process.redis.del("state:running")
       process.redis.set('value', "error")
       process.redis.set('error', e.inspect)
     end
@@ -197,6 +250,7 @@ class QueueManager
 
       process.redis.set('value', dest_dir.path.to_s)
     rescue StandardError => e
+      process.redis.del("state:running")
       process.redis.set('value', 'error')
       process.redis.set('error', e.inspect)
     end

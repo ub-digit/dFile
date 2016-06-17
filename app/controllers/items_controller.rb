@@ -79,6 +79,10 @@ class ItemsController < ApplicationController
     create_process(process: "COPY_FOLDER")
   end
 
+  def convert_images
+    create_process(process: "CONVERT_IMAGES")
+  end
+
   # Returns a file, or information about a file
   def download_file
     source_file = Item.new(Path.new(params[:source_file]))

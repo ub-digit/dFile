@@ -20,5 +20,6 @@ Rails.application.routes.draw do
     get 'move_to_trash', to: 'items#move_to_trash'
     get 'thumbnail', to: 'items#thumbnail'
     get '/rename_files', to: 'items#rename_files'
+    get '/convert_images', to: 'items#convert_images'
   end
 end

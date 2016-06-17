@@ -161,6 +161,14 @@ class Item
 		@path.basename('.*')
 	end
 
+  def basename
+    @path.basename
+  end
+
+  def to_s
+    @path.to_s
+  end
+
 	def as_json(options={})
     if dir?
       {
