@@ -158,6 +158,21 @@ class ItemsController < ApplicationController
 		render json: source_dir.files(file_type: params[:ext], show_catalogues: show_catalogues)
 	end
 
+  # Renames files according to given pattern
+  def rename_files
+    source_dir = Item.new(Path.new(params[:source_dir]))
+    format = params[:string_format]
+    
+    response = {}
+    if source_dir.rename_files(format: format)
+      render json: response, status: 200
+    else
+      render json: response, status: 422
+    end
+  end
+
+
+
 	# Combines pdf files within a source directory and stores them as a single file
 	def combine_pdf_files
 		source_dir = Item.new(Path.new(params[:source]))

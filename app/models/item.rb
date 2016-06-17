@@ -27,6 +27,22 @@ class Item
     nil
   end
 
+  # Renames files in folder according to given format
+  def rename_files(format:)
+    require 'pp'
+    child_items.each_with_index do |child, index|
+      new_name = sprintf(format, index+1)
+      pp new_name
+      extname = child.path.extname
+      pp extname
+      dirname = child.path.dirname.to_s
+      pp dirname
+      new_filename = dirname + "/" + new_name + extname
+      pp new_filename
+      FileManager.rename(from_file: child.path.to_s, to_file: new_filename)
+    end
+  end
+
 	# Returns checksum of file object
 	def checksum
 		@checksum ||= FileManager.checksum(@path)

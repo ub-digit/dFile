@@ -66,4 +66,9 @@ class FileManager
       io_read.read
     }
   end
+
+  def self.rename(from_file:, to_file:)
+    File.rename(from_file, to_file)
+    true
+  end
 end
