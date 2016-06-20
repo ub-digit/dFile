@@ -211,6 +211,12 @@ class ItemsController < ApplicationController
 		dest_file = Item.new(Path.new(params[:dest_file]))
 
 		response = {}
+    if source_file.path.to_s == dest_file.path.to_s
+      response[:msg] = "Same file"
+      render json: response, status: 200
+      return
+    end
+
 		response[:source_file] = source_file
 		response[:dest_file] = dest_file
 		if source_file.move_to(dest_file)

@@ -52,7 +52,9 @@ class Item
   end
 
   def create(content, permission=nil)
-    return false if file_exist?
+    if file_exist?
+      return false if !FileManager.delete_file(@path)
+    end
 
     return false if !path.create_structure(permission)
 

@@ -11,6 +11,10 @@ class FileManager
     FileUtils.rm_rf(path.to_s)
   end
 
+  def self.delete_file(path)
+    FileUtils.rm(path.to_s)
+  end
+
   def self.move(source_path, dest_path)
     FileUtils.mv(source_path.to_s, dest_path.to_s)
   end
