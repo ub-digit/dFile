@@ -8,7 +8,7 @@ class FileManager
 
   # Removes source directory
   def self.delete_directory(path)
-    FileUtils.rm_rf(path)
+    FileUtils.rm_rf(path.to_s)
   end
 
   def self.move(source_path, dest_path)
@@ -49,6 +49,7 @@ class FileManager
   def self.combine_pdf_files(files, dest_file)
     args = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', "-sOutputFile=#{dest_file.to_s}"] + files
     execute(args)
+    return true
   end
 
   # Copies file to destination path 

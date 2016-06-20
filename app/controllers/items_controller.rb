@@ -179,13 +179,13 @@ class ItemsController < ApplicationController
 
 	# Combines pdf files within a source directory and stores them as a single file
 	def combine_pdf_files
-		source_dir = Item.new(Path.new(params[:source]))
-		dest_file = Item.new(Path.new(params[:dest]+".pdf"))
+		source_dir = Item.new(Path.new(params[:source_dir]))
+		dest_file = Item.new(Path.new(params[:dest_file]))
 
 		response = {}
 		if !source_dir.path.exist?
-			response[:msg] = "Fail"
-			render json: response
+			response[:error] = "Directory #{params[:source_dir]} does not exist"
+			render json: response, status: 404
 			return
 		end
 
@@ -198,10 +198,11 @@ class ItemsController < ApplicationController
 
 		if FileManager.combine_pdf_files(pdf_files,dest_file.path)
 			response[:msg] = "Success"
+      render json: response, status: 200
 		else
-			response[:msg] = "Fail"
+			response[:error] = "Fail"
+      render json: response, status: 422
 		end
-		render json: response
 	end
 
 	#Moves files of a given type from a source directory to destination
@@ -350,6 +351,22 @@ class ItemsController < ApplicationController
       render json: response, status: 200
     else
       response[:msg] = "Fail"
+      render json: response, status: 422
+    end
+  end
+
+  def delete_files
+    source_dir = Item.new(Path.new(params[:source_dir]))
+
+    response = {}
+    if !source_dir.exist?
+      response[:error] = "No folder at location #{params[:source_dir]}"
+      render json: response, status: 404
+    elsif FileManager.delete_directory(source_dir.path)
+      response[:msg] = "Success"
+      render json: response, status: 200
+    else
+      response[:error] = "Fail"
       render json: response, status: 422
     end
   end

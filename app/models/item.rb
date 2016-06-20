@@ -82,8 +82,8 @@ class Item
 
 		return true
 	end
-
-	# Copies all files of given type to destination directory
+  
+ 	# Copies all files of given type to destination directory
 	def copy_files_to(dest_dir, type)
 		return false if !dir?
 

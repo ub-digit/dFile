@@ -53,7 +53,7 @@ class Path < Pathname
 
 	# Returns all children of given filetype as an array
 	def files_as_array(file_type = nil)
-		items = files(file_type: file_type)
+		items = files(file_type: file_type, show_catalogues: false)
 		file_list = []
 		items.each do |item|
 			file_list << item.path.to_s
