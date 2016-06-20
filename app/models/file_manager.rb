@@ -63,7 +63,10 @@ class FileManager
   def self.execute(args)
     output = nil
     IO.popen(args) { |io_read|
-      io_read.read
+      io_read.close
+      if !$?.success?
+        raise StandardError, "Could not execute: #{args}"
+      end
     }
   end
 
