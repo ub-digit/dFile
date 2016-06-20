@@ -178,16 +178,16 @@ class QueueManager
 
   # Calcluates a checksum for given source_file and sets result key
   def checksum(process:, source_file:)
-    source_file = Item.new(Path.new(source_file))
-    Rails.logger.info "CHECKSUM: Source file: #{source_file.path.to_s}"
-
-    # If file does not exist, create error key and message
-    if !source_file.path.exist?
-      process.error_msg("Source file #{source_file.path.to_s} does not exist!")
-      return
-    end
-
     begin
+      source_file = Item.new(Path.new(source_file))
+      Rails.logger.info "CHECKSUM: Source file: #{source_file.path.to_s}"
+
+      # If file does not exist, create error key and message
+      if !source_file.path.exist?
+        process.error_msg("Source file #{source_file.path.to_s} does not exist!")
+        return
+      end
+
       checksum = FileManager.checksum(source_file.path)
       process.redis.set('value', checksum)
     rescue StandardError => e
@@ -199,40 +199,44 @@ class QueueManager
 
   # Moves given source_folder to dest_folder
   def copy_folder(process:, delete_source: false, source_dir:, dest_dir:)
-    start_time = Time.now
-    source_dir = Item.new(Path.new(source_dir))
-    dest_dir = Item.new(Path.new(dest_dir))
-
-    Rails.logger.info "MOVE_FOLDER #{source_dir.path.to_s} to #{dest_dir.path.to_s}"
-
-    # Make sure source dir exist
-    if !source_dir.exist? || !source_dir.dir?
-      process.error_msg("Source directory #{source_dir.path.to_s} does not exist")
-      return
-    end
-
-    # Make sure dest_dir doesn't exist
-    if dest_dir.exist?
-      process.error_msg("Destination directory #{dest_dir.path.to_s} already exists")
-      return
-    end
-
-    # Make sure dest dir has enough free space
-    free_disk_space = FreeDiskSpace.gigabytes(dest_dir.path.parent.to_s)
-    if free_disk_space < MINIMUM_FREE_DISK_SPACE
-      process.error_msg("Destination directory does not have enough disk space: #{free_disk_space.to_i}GB, required: #{MINIMUM_FREE_DISK_SPACE}GB")
-      return
-    end
-
     begin
+      start_time = Time.now
+      source_dir = Item.new(Path.new(source_dir))
+      dest_dir = Item.new(Path.new(dest_dir))
+
+      Rails.logger.info "MOVE_FOLDER #{source_dir.path.to_s} to #{dest_dir.path.to_s}"
+
+      # Make sure source dir exist
+      if !source_dir.exist? || !source_dir.dir?
+        process.error_msg("Source directory #{source_dir.path.to_s} does not exist")
+        return
+      end
+
+      # Make sure dest_dir doesn't exist
+      if dest_dir.exist?
+        process.error_msg("Destination directory #{dest_dir.path.to_s} already exists")
+        return
+      end
+
+      # Make sure dest dir has enough free space
+      #free_disk_space = FreeDiskSpace.gigabytes(dest_dir.path.parent.to_s)
+      #if free_disk_space < MINIMUM_FREE_DISK_SPACE
+      #  process.error_msg("Destination directory does not have enough disk space: #{free_disk_space.to_i}GB, required: #{MINIMUM_FREE_DISK_SPACE}GB")
+      #  return
+      #end
+
       # Copy folder to dest_dir
       FileManager.create_structure(dest_dir.path.to_s)
       number_of_files = source_dir.path.all_files.count
       folder_size = source_dir.path.total_size
       source_dir.path.all_files.each_with_index do |source_file, index|
+        # Ignore .db files and .DS_STORE files
+        if ['.db', '.DS_STORE'].include? source_file.path.extname
+          next
+        end
         process.redis.set('progress', "Copying file #{index+1}/#{number_of_files}, #{source_file.basename}, Total size: #{folder_size}")
         dest_file = Pathname.new("#{dest_dir.path.to_s}/#{source_file.basename}")
-        FileManager.copy(source_file, dest_file)
+        FileManager.copy(source_file.path, dest_file)
       end
 
       end_time = Time.now
