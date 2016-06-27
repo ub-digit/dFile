@@ -102,6 +102,8 @@ class QueueManager
           ocr_folder(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], formats: process.params['dest_dir'], languages: process.params['languages'], documentSeparationMethod: process.params['documentSeparationMethod'], deskew: process.params['deskew'])
         when "CONVERT_IMAGES"
           convert_images(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format_params: process.params['format_params'], to_filetype: process.params['to_filetype'])
+        when "COMBINE_PDF_FILES"
+          combine_pdf_files(process: process, source_dir: process.params['source_dir'], dest_file: process.params['dest_file'])
 
         end
 
@@ -124,6 +126,39 @@ class QueueManager
 
   def redis
     @redis ||= RedisInterface.new
+  end
+
+  def combine_pdf_files(process:, source_dir:, dest_file:)
+    begin
+      start_time = Time.now
+      source_dir = Item.new(Path.new(source_dir))
+      dest_file = Item.new(Path.new(dest_file))
+
+      Rails.logger.info "COMBINE_PDF_FILES #{source_dir.path.to_s} to #{dest_file.path.to_s}"
+
+      # Make sure source dir exist
+      if !source_dir.exist? || !source_dir.dir?
+        process.error_msg("Source directory #{source_dir.path.to_s} does not exist")
+        return
+      end
+
+
+		  dest_file.path.create_structure
+		  pdf_files = source_dir.path.files_as_array('pdf')
+      process.redis.set('progress', "Combining #{pdf_files.count} files to #{dest_file}")
+
+		  FileManager.combine_pdf_files(pdf_files,dest_file.path)
+
+      end_time = Time.now
+      total_time = end_time - start_time
+
+      process.redis.set('progress', "Combined #{source_dir} to #{dest_file} in #{total_time.to_i}s")
+      process.redis.set('value', dest_file.path.to_s)
+    rescue StandardError => e
+      process.redis.del("state:running")
+      process.redis.set('value', 'error')
+      process.redis.set('error', e.inspect)
+    end
   end
 
   def convert_images(process:, source_dir:, dest_dir:, format_params:, to_filetype:)
