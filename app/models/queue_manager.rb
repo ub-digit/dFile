@@ -95,9 +95,9 @@ class QueueManager
         when "CHECKSUM"
           checksum(process: process, source_file: process.params['source_file'])
         when "MOVE_FOLDER"
-          copy_folder(delete_source: true, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'])
+          copy_folder(delete_source: true, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format: process.params['format_params'])
         when "COPY_FOLDER"
-          copy_folder(delete_source: false, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'])
+          copy_folder(delete_source: false, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format: process.params['format_params'])
         when "OCR_FOLDER"
           ocr_folder(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], formats: process.params['dest_dir'], languages: process.params['languages'], documentSeparationMethod: process.params['documentSeparationMethod'], deskew: process.params['deskew'])
         when "CONVERT_IMAGES"
@@ -233,7 +233,7 @@ class QueueManager
   end
 
   # Moves given source_folder to dest_folder
-  def copy_folder(process:, delete_source: false, source_dir:, dest_dir:)
+  def copy_folder(process:, delete_source: false, source_dir:, dest_dir:, format: nil)
     begin
       start_time = Time.now
       source_dir = Item.new(Path.new(source_dir))
@@ -270,7 +270,12 @@ class QueueManager
           next
         end
         process.redis.set('progress', "Copying file #{index+1}/#{number_of_files}, #{source_file.basename}, Total size: #{folder_size}")
-        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{source_file.basename}")
+        if format
+          new_name = sprintf(format, index+1) + source_file.extname 
+        else
+          new_name = source_file.basename
+        end
+        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{new_name}")
         FileManager.copy(source_file.path, dest_file)
       end
 

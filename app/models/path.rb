@@ -81,7 +81,7 @@ class Path < Pathname
   def all_files
     return @all_files if @all_files.present?
     @all_files = []
-    children.each do |child|
+    sort_files(children).each do |child|
       @all_files << Item.new(Path.new(child.to_s))
       if child.directory?
         @all_files += Path.new(child.to_s).all_files
