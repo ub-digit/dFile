@@ -193,6 +193,9 @@ class QueueManager
       number_of_files = source_dir.path.all_files.count
       folder_size = source_dir.path.total_size
       source_dir.path.files(show_catalogues: false).each_with_index do |source_file, index|
+        if ['.db', '.DS_STORE'].include? source_file.path.extname
+          next
+        end
         process.redis.set('progress', "Converting file #{index+1}/#{number_of_files}, #{source_file.basename}, Total size: #{folder_size}")
         dest_file = Pathname.new("#{dest_dir.path.to_s}/#{source_file.filename}.#{to_filetype}")
         FileManager.copy_and_convert(source_path: source_file, dest_path: dest_file, arguments: format_params)
