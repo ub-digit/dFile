@@ -270,7 +270,7 @@ class QueueManager
           next
         end
         process.redis.set('progress', "Copying file #{index+1}/#{number_of_files}, #{source_file.basename}, Total size: #{folder_size}")
-        if format
+        if format.present?
           new_name = sprintf(format, index+1) + source_file.extname 
         else
           new_name = source_file.basename.to_s
