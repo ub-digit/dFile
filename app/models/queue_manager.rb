@@ -273,7 +273,7 @@ class QueueManager
         if format
           new_name = sprintf(format, index+1) + source_file.extname 
         else
-          new_name = source_file.basename
+          new_name = source_file.basename.to_s
         end
         dest_file = Pathname.new("#{dest_dir.path.to_s}/#{new_name}")
         FileManager.copy(source_file.path, dest_file)
