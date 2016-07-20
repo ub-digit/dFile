@@ -2,72 +2,45 @@ class ItemsController < ApplicationController
 
 	# Calculate checksum of file
 	def checksum 
-		source_file = Item.new(Path.new(params[:source_file]))
-		response = {}
-		response[:source_file] = source_file
+		#source_file = Item.new(Path.new(params[:source_file]))
+		#response = {}
+		#response[:source_file] = source_file
 
-		if !source_file.path.exist?
-			response[:msg] = "Fail"
-			render json: response
-			return
-		end
+		#if !source_file.path.exist?
+		#	response[:msg] = "Fail"
+		#	render json: response
+		#	return
+		#end
 
-    # Ask redis for id
-    redis = RedisInterface.new
-    id = redis.incr('dFile:id') 
+    ## Ask redis for id
+    #redis = RedisInterface.new
+    #id = redis.incr('dFile:id') 
 
-    # Create work order item in redis for dFile
-    redis.transaction do
-      redis.set("dFile:processes:#{id}:state:queued", id)
-      redis.set("dFile:processes:#{id}:state", "QUEUED")
-      redis.set("dFile:processes:#{id}:process", "CHECKSUM")
-      redis.set("dFile:processes:#{id}:params", params.to_json)
-      redis.set("dFile:processes:#{id}:priority", "1")
-    end
+    ## Create work order item in redis for dFile
+    #redis.transaction do
+    #  redis.set("dFile:processes:#{id}:state:queued", id)
+    #  redis.set("dFile:processes:#{id}:state", "QUEUED")
+    #  redis.set("dFile:processes:#{id}:process", "CHECKSUM")
+    #  redis.set("dFile:processes:#{id}:params", params.to_json)
+    #  redis.set("dFile:processes:#{id}:priority", "1")
+    #end
 
-    # Start QueueManager
-    QueueManager.new.run
+    ## Start QueueManager
+    #QueueManager.new.run
 
-		if id
-			response[:msg] = "Success"
-			response[:id] = id
-      render json: response, status: 200
-		else
-			response[:msg] = "Fail"
-      render json: response, status: 400
-		end
+		#if id
+		#	response[:msg] = "Success"
+		#	response[:id] = id
+    #  render json: response, status: 200
+		#else
+		#	response[:msg] = "Fail"
+    #  render json: response, status: 400
+		#end
+
+    create_process(process: "CHECKSUM")
 
 	end	
 
-  def create_process(process:)
-    # Ask redis for id
-    redis = RedisInterface.new
-    id = redis.incr('dFile:id')
-
-
-    # Create process item 
-    redis.transaction do
-      redis.set("dFile:processes:#{id}:state:queued", id)
-      redis.set("dFile:processes:#{id}:state", "QUEUED")
-      redis.set("dFile:processes:#{id}:process", process)
-      redis.set("dFile:processes:#{id}:params", params.to_json)
-      redis.set("dFile:processes:#{id}:priority", "1")
-    end
-
-    
-    QueueManager.new.run
-
-    response = {}
-    if id
-      response[:msg] = "Success"
-      response[:id] = id
-      render json: response, status: 200
-    else
-      response[:msg] = "Fail"
-      render json: response, status: 400
-    end
-    
-  end
 
   # Moves a source_dir to dest_dir file by file
   def move_folder_ind
@@ -175,35 +148,9 @@ class ItemsController < ApplicationController
     end
   end
 
-
-
   # Combines pdf files within a source directory and stores them as a single file
   def combine_pdf_files
     create_process(process: "COMBINE_PDF_FILES")
-   # source_dir = Item.new(Path.new(params[:source_dir]))
-   # dest_file = Item.new(Path.new(params[:dest_file]))
-
-   # response = {}
-   # if !source_dir.path.exist?
-   #   response[:error] = "Directory #{params[:source_dir]} does not exist"
-   #   render json: response, status: 404
-   #   return
-   # end
-
-   # dest_file.path.create_structure
-   # pdf_files = source_dir.path.files_as_array('pdf')
-
-   # response[:source_dir] = source_dir
-   # response[:dest_file] = dest_file
-   # response[:files_combined_count] = pdf_files.size
-
-   # if FileManager.combine_pdf_files(pdf_files,dest_file.path)
-   #   response[:msg] = "Success"
-   #   render json: response, status: 200
-   # else
-   #   response[:error] = "Fail"
-   #   render json: response, status: 422
-   # end
   end
 
 	#Moves files of a given type from a source directory to destination
@@ -424,4 +371,34 @@ class ItemsController < ApplicationController
     render json: response, status: 200
   end
 
+  private
+  def create_process(process:)
+    # Ask redis for id
+    redis = RedisInterface.new
+    id = redis.incr('dFile:id')
+
+
+    # Create process item 
+    redis.transaction do
+      redis.set("dFile:processes:#{id}:state:queued", id)
+      redis.set("dFile:processes:#{id}:state", "QUEUED")
+      redis.set("dFile:processes:#{id}:process", process)
+      redis.set("dFile:processes:#{id}:params", params.to_json)
+      redis.set("dFile:processes:#{id}:priority", "1")
+    end
+
+    
+    QueueManager.new.run
+
+    response = {}
+    if id
+      response[:msg] = "Success"
+      response[:id] = id
+      render json: response, status: 200
+    else
+      response[:msg] = "Fail"
+      render json: response, status: 400
+    end
+    
+  end
 end

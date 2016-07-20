@@ -51,8 +51,13 @@ class FileManager
 
   # Combines a list of files into a destination file using ghostscript
   def self.combine_pdf_files(files, dest_file)
-    args = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', "-sOutputFile=#{dest_file.to_s}"] + files
-    execute(args)
+    pdf = CombinePDF.new
+    files.each do |file|
+      pdf << CombinePDF.load(file)
+    end
+    pdf.save dest_file
+    #args = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', "-sOutputFile=#{dest_file.to_s}"] + files
+    #execute(args)
     return true
   end
 
