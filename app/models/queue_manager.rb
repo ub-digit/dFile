@@ -278,7 +278,14 @@ class QueueManager
         else
           new_name = source_file.basename.to_s
         end
-        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{new_name}")
+
+        relative_path = source_file.path.relative_path_from(source_dir.path)
+        dirname,basename = relative_path.split
+        if !dirname.to_s.present? || dirname.to_s == '.'
+          dirname = ""
+        end
+        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{dirname}/#{new_name}")
+        FileManager.create_structure(dest_file)
         FileManager.copy(source_file.path, dest_file)
       end
 
