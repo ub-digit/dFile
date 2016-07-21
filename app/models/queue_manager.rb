@@ -192,7 +192,7 @@ class QueueManager
       FileManager.create_structure(dest_dir.path.to_s)
       number_of_files = source_dir.path.all_files.count
       folder_size = source_dir.path.total_size
-      source_dir.path.files(show_catalogues: false).each_with_index do |source_file, index|
+      source_dir.path.files.each_with_index do |source_file, index|
         if ['.db', '.DS_STORE'].include? source_file.path.extname
           next
         end
