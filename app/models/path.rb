@@ -41,12 +41,12 @@ class Path < Pathname
 		return [] if !directory?
 		items = []
 		sort_files(children).each do |child|
-			next if !child.file? && !show_catalogues
-			next if file_type && child.extname != ".#{file_type}" && !child.directory?
-			items << Item.new(Path.new(child.to_s))
       if child.directory? && nested_files
         items += child.files(file_type: file_type, show_catalogues: show_catalogues)
       end
+			next if !child.file? && !show_catalogues
+			next if file_type && child.extname != ".#{file_type}" && !child.directory?
+			items << Item.new(Path.new(child.to_s))
 		end
 		items
 	end
@@ -82,9 +82,10 @@ class Path < Pathname
     return @all_files if @all_files.present?
     @all_files = []
     sort_files(children).each do |child|
-      @all_files << Item.new(Path.new(child.to_s))
       if child.directory?
         @all_files += Path.new(child.to_s).all_files
+      else
+        @all_files << Item.new(Path.new(child.to_s))
       end
     end
     return @all_files
