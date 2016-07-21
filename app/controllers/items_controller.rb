@@ -2,45 +2,8 @@ class ItemsController < ApplicationController
 
 	# Calculate checksum of file
 	def checksum 
-		#source_file = Item.new(Path.new(params[:source_file]))
-		#response = {}
-		#response[:source_file] = source_file
-
-		#if !source_file.path.exist?
-		#	response[:msg] = "Fail"
-		#	render json: response
-		#	return
-		#end
-
-    ## Ask redis for id
-    #redis = RedisInterface.new
-    #id = redis.incr('dFile:id') 
-
-    ## Create work order item in redis for dFile
-    #redis.transaction do
-    #  redis.set("dFile:processes:#{id}:state:queued", id)
-    #  redis.set("dFile:processes:#{id}:state", "QUEUED")
-    #  redis.set("dFile:processes:#{id}:process", "CHECKSUM")
-    #  redis.set("dFile:processes:#{id}:params", params.to_json)
-    #  redis.set("dFile:processes:#{id}:priority", "1")
-    #end
-
-    ## Start QueueManager
-    #QueueManager.new.run
-
-		#if id
-		#	response[:msg] = "Success"
-		#	response[:id] = id
-    #  render json: response, status: 200
-		#else
-		#	response[:msg] = "Fail"
-    #  render json: response, status: 400
-		#end
-
     create_process(process: "CHECKSUM")
-
 	end	
-
 
   # Moves a source_dir to dest_dir file by file
   def move_folder_ind
@@ -132,7 +95,12 @@ class ItemsController < ApplicationController
     else
       show_catalogues = false
     end
-		render json: source_dir.files(file_type: params[:ext], show_catalogues: show_catalogues)
+    if params[:ext].present?
+      file_type = params[:ext]
+    else
+      file_type = nil
+    end
+		render json: source_dir.files(file_type: file_type, show_catalogues: show_catalogues)
 	end
 
   # Renames files according to given pattern
