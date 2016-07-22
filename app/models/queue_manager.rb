@@ -251,8 +251,8 @@ class QueueManager
       end
 
       # Make sure dest_dir doesn't exist
-      if dest_dir.exist?
-        process.error_msg("Destination directory #{dest_dir.path.to_s} already exists")
+      if dest_dir.exist? && dest_dir.path.children.present?
+        process.error_msg("Destination directory #{dest_dir.path.to_s} already exists and has contents")
         return
       end
 
@@ -282,10 +282,12 @@ class QueueManager
         relative_path = source_file.path.relative_path_from(source_dir.path)
         dirname,basename = relative_path.split
         if !dirname.to_s.present? || dirname.to_s == '.'
-          dirname = ""
+          dirname_string = ""
+        else
+          dirname_string = dirname.to_s
         end
-        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{dirname}/#{new_name}")
-        FileManager.create_structure(dest_file)
+        dest_file = Pathname.new("#{dest_dir.path.to_s}/#{dirname_string}/#{new_name}")
+        FileManager.create_structure(dest_file.dirname)
         FileManager.copy(source_file.path, dest_file)
       end
 
