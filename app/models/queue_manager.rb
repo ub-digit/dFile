@@ -97,7 +97,7 @@ class QueueManager
         when "MOVE_FOLDER"
           copy_folder(delete_source: true, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format: process.params['format_params'])
         when "COPY_FOLDER"
-          copy_folder(delete_source: false, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format: process.params['format_params'])
+          copy_folder(delete_source: false, process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], format: process.params['format_params'], filetype: process.params['filetype'])
         when "OCR_FOLDER"
           ocr_folder(process: process, source_dir: process.params['source_dir'], dest_dir: process.params['dest_dir'], formats: process.params['dest_dir'], languages: process.params['languages'], documentSeparationMethod: process.params['documentSeparationMethod'], deskew: process.params['deskew'])
         when "CONVERT_IMAGES"
@@ -236,7 +236,7 @@ class QueueManager
   end
 
   # Moves given source_folder to dest_folder
-  def copy_folder(process:, delete_source: false, source_dir:, dest_dir:, format: nil)
+  def copy_folder(process:, delete_source: false, source_dir:, dest_dir:, format: nil, filetype: nil)
     begin
       start_time = Time.now
       source_dir = Item.new(Path.new(source_dir))
@@ -267,7 +267,12 @@ class QueueManager
       FileManager.create_structure(dest_dir.path.to_s)
       number_of_files = source_dir.path.all_files.count
       folder_size = source_dir.path.total_size
-      source_dir.path.all_files.each_with_index do |source_file, index|
+      if filetype.present?
+        files = source_dir.path.files(file_type: filetype, show_catalogues: false, nested_files: false)
+      else
+        files = source_dir.path.all_files
+      end
+      files.each_with_index do |source_file, index|
         # Ignore .db files and .DS_STORE files
         if ['.db', '.DS_STORE'].include? source_file.path.extname
           next
