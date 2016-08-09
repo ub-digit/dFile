@@ -249,15 +249,15 @@ class ItemsController < ApplicationController
   # Moves source_dir to archive folder with suffix if folder exists
   def move_to_trash
     source_dir = Item.new(Path.new(params[:source_dir]))
-    dest_dir_root = Item.new(Path.new("TRASH:" + source_dir.path.input_path))
+    dest_dir_path = Pathname.new(source_dir.path.dirname.to_s + "/RESTARTED/RESTARTED_" + source_dir.path.basename.to_s)
 
-    dest_dir_string = dest_dir_root.path.to_s
+    dest_dir_string = dest_dir_path.to_s
     dir_found = false
     i = 1
     while(!dir_found)
       dest_dir = Item.new(Path.new(dest_dir_string))
       if dest_dir.exist?
-        dest_dir_string = dest_dir_root.path.to_s + "_#{i}"
+        dest_dir_string = dest_dir_path.to_s + "_#{i}"
         i += 1
       else
         dir_found = true
