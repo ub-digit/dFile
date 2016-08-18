@@ -113,7 +113,7 @@ class Item
 
 		return false if !dest_file.path.create_structure
 
-		return false if !FileManager.copy_and_convert(@path,dest_file.path, quality, size)
+		return false if !FileManager.copy_and_convert(source_path: @path, dest_path: dest_file.path, quality: quality, size: size)
 		
 		return true
 	end
