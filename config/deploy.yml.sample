@@ -1,35 +1,17 @@
 production:
   host: app-production-2.ub.gu.se
+  port: 22
   user: apps
-  roles:
-    - app
-    - db
-    - web
   path: '/apps/dfile'
-  linked_files:
-    - 'config/initializers/config.rb'
-    - 'config/redis.yml'
 
 staging:
   host: app-staging-2.ub.gu.se
+  port: 22
   user: apps
-  roles:
-    - app
-    - db
-    - web
   path: '/apps/dfile'
-  linked_files:
-    - 'config/initializers/config.rb'
-    - 'config/redis.yml'
 
 lab:
   host: app-lab-2.ub.gu.se
+  port: 22
   user: apps
-  roles:
-    - app
-    - db
-    - web
   path: '/apps/dfile'
-  linked_files:
-    - 'config/initializers/config.rb'
-    - 'config/redis.yml'

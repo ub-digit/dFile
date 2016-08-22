@@ -1,10 +1,8 @@
 # config valid only for current version of Capistrano
-lock '3.4.1'
-
 set :application, 'dFile'
 set :repo_url, 'https://github.com/ub-digit/dFile.git'
 
-set :rvm_ruby_version, '2.1.5'      # Defaults to: 'default'
+set :rvm_ruby_version, '2.3.1'      # Defaults to: 'default'
 
 # Returns config for current stage assigned in config/deploy.yml
 def deploy_config
@@ -14,8 +12,8 @@ def deploy_config
 end
 
 # Copied into /{app}/shared/config from respective sample file
-set :linked_files, deploy_config['linked_files']
+set :linked_files, ['config/initializers/config.rb', 'config/redis.yml']
 
-server deploy_config['host'], user: deploy_config['user'], roles: deploy_config['roles']
+server deploy_config['host'], user: deploy_config['user'], roles: ['app', 'db', 'web'], port: deploy_config['port']
 
 set :deploy_to, deploy_config['path']
