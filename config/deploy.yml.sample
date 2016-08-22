@@ -2,16 +2,16 @@ production:
   host: app-production-2.ub.gu.se
   port: 22
   user: apps
-  path: '/apps/dfile'
+  path: '/apps/dFile'
 
 staging:
   host: app-staging-2.ub.gu.se
   port: 22
   user: apps
-  path: '/apps/dfile'
+  path: '/apps/dFile'
 
 lab:
   host: app-lab-2.ub.gu.se
   port: 22
   user: apps
-  path: '/apps/dfile'
+  path: '/apps/dFile'
