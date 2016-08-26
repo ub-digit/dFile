@@ -91,13 +91,29 @@ class Path < Pathname
     return @all_files
   end
 
-	# creates catalog structure for the path
-	def create_structure(permission=nil)
-		FileManager.create_structure(self.dirname.to_s, permission)
-	end
+  # creates catalog structure for the path
+  def create_structure(permission=nil)
+    FileManager.create_structure(self.dirname.to_s, permission)
+  end
 
-	# Sorts a list of files based on filename
-	def sort_files(files)
-		files.sort_by { |x| x.basename.to_s[/^(\d+)\./,1].to_i }.map
-	end
+  # Sorts a list of files based on filename
+  def sort_files(files)
+    files.sort_by do |x|
+      bname = x.basename.to_s
+      numeric_subpart = 0
+      numeric_file_part = bname[/^(\d+)/,1]
+      if numeric_file_part.blank?
+        numeric_file_part = 2**64-1
+        numeric_subpart = bname.gsub(/[^\d]/,'')
+        if numeric_subpart.blank?
+          numeric_subpart = 2**64-1
+        end
+        numeric_subpart = numeric_subpart.to_i
+      end
+      numeric_file_part = numeric_file_part.to_i
+#      tmp = x.basename.to_s[/^(\d+)\./,1].to_i 
+      sort_order = [numeric_file_part, numeric_subpart]
+      sort_order
+    end.map
+  end
 end

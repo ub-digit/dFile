@@ -1,9 +1,9 @@
 class ItemsController < ApplicationController
 
-	# Calculate checksum of file
-	def checksum 
+  # Calculate checksum of file
+  def checksum 
     create_process(process: "CHECKSUM")
-	end	
+  end	
 
   # Moves a source_dir to dest_dir file by file
   def move_folder_ind
@@ -54,42 +54,42 @@ class ItemsController < ApplicationController
     end
   end
 
-	#Copies a file as given destination file
-	def copy_file
-		source_file = Item.new(Path.new(params[:source_file]))
-		dest_file = Item.new(Path.new(params[:dest_file]))
-		response = {}
-		response[:source_file] = source_file
-		response[:dest_file] = dest_file
-		if source_file.copy_to(dest_file)
-			response[:msg] = "Success"
+  #Copies a file as given destination file
+  def copy_file
+    source_file = Item.new(Path.new(params[:source_file]))
+    dest_file = Item.new(Path.new(params[:dest_file]))
+    response = {}
+    response[:source_file] = source_file
+    response[:dest_file] = dest_file
+    if source_file.copy_to(dest_file)
+      response[:msg] = "Success"
       render json: response, status: 200
-		else
-			response[:msg] = "Fail"
+    else
+      response[:msg] = "Fail"
       response[:error] = "Copy failed" 
       render json: response, status: 422
-		end
-	end
+    end
+  end
 
-	# Copies files of a given type from a source directory to destination
-	def copy_files
-		source_dir = Item.new(Path.new(params[:source]))
-		dest_dir = Item.new(Path.new(params[:dest]))
-		type  = params[:type]
-		response = {}
-		response[:source_dir] = source_dir
-		response[:dest_dir] = dest_dir
-		if source_dir.copy_files_to(dest_dir, type)
-			response[:msg] = "Success"
-		else
-			response[:msg] = "Fail"
-		end
-		render json: response
-	end
+  # Copies files of a given type from a source directory to destination
+  def copy_files
+    source_dir = Item.new(Path.new(params[:source]))
+    dest_dir = Item.new(Path.new(params[:dest]))
+    type  = params[:type]
+    response = {}
+    response[:source_dir] = source_dir
+    response[:dest_dir] = dest_dir
+    if source_dir.copy_files_to(dest_dir, type)
+      response[:msg] = "Success"
+    else
+      response[:msg] = "Fail"
+    end
+    render json: response
+  end
 
-	# Returns a list of all files in directory
-	def list_files
-		source_dir = Path.new(params[:source_dir])
+  # Returns a list of all files in directory
+  def list_files
+    source_dir = Path.new(params[:source_dir])
     if params.has_key?(:show_catalogues)
       show_catalogues = params[:show_catalogues]
     else
@@ -100,8 +100,8 @@ class ItemsController < ApplicationController
     else
       file_type = nil
     end
-		render json: source_dir.files(file_type: file_type, show_catalogues: show_catalogues)
-	end
+    render json: source_dir.files(file_type: file_type, show_catalogues: show_catalogues)
+  end
 
   # Renames files according to given pattern
   def rename_files
@@ -121,45 +121,45 @@ class ItemsController < ApplicationController
     create_process(process: "COMBINE_PDF_FILES")
   end
 
-	#Moves files of a given type from a source directory to destination
-	def move_file
-		source_file = Item.new(Path.new(params[:source_file]))
-		dest_file = Item.new(Path.new(params[:dest_file]))
+  #Moves files of a given type from a source directory to destination
+  def move_file
+    source_file = Item.new(Path.new(params[:source_file]))
+    dest_file = Item.new(Path.new(params[:dest_file]))
 
-		response = {}
+    response = {}
     if source_file.path.to_s == dest_file.path.to_s
       response[:msg] = "Same file"
       render json: response, status: 200
       return
     end
 
-		response[:source_file] = source_file
-		response[:dest_file] = dest_file
-		if source_file.move_to(dest_file)
-			response[:msg] = "Success"
+    response[:source_file] = source_file
+    response[:dest_file] = dest_file
+    if source_file.move_to(dest_file)
+      response[:msg] = "Success"
       render json: response, status: 200
-		else
-			response[:msg] = "Fail"
+    else
+      response[:msg] = "Fail"
       render json: response, status: 402
-		end
-	end
+    end
+  end
 
-	#Moves files of a given type from a source directory to destination
-	def move_files
-		source_dir = Item.new(Path.new(params[:source]))
-		dest_dir = Item.new(Path.new(params[:dest]))
-		type  = params[:type]
-		response = {}
-		response[:source_dir] = source_dir
-		response[:dest_dir] = dest_dir
-		if source_dir.move_files_to(dest_dir, type)
-			response[:msg] = "Success"
+  #Moves files of a given type from a source directory to destination
+  def move_files
+    source_dir = Item.new(Path.new(params[:source]))
+    dest_dir = Item.new(Path.new(params[:dest]))
+    type  = params[:type]
+    response = {}
+    response[:source_dir] = source_dir
+    response[:dest_dir] = dest_dir
+    if source_dir.move_files_to(dest_dir, type)
+      response[:msg] = "Success"
       render json: response, status: 200
-		else
-			response[:msg] = "Fail"
+    else
+      response[:msg] = "Fail"
       render json: response, status: 402
-		end
-	end
+    end
+  end
 
   #Moves files of a given type from a source directory to destination
   def move_folder
@@ -178,73 +178,73 @@ class ItemsController < ApplicationController
     end
   end
 
-	# Returns file count of specific file type in given directory
-	def file_count
-		source_dir = Item.new(Path.new(params[:source]))
-		type = params[:type]
+  # Returns file count of specific file type in given directory
+  def file_count
+    source_dir = Item.new(Path.new(params[:source]))
+    type = params[:type]
 
-		response = {}
-		response[:source_dir] = source_dir
-		file_count = source_dir.path.file_count(file_type: type)
-		
-		if file_count
-			response[:msg] = "Success"
-			response[:file_count] = file_count
-		else
-			response[:msg] = "Fail"
-		end
-		render json: response
-	end
+    response = {}
+    response[:source_dir] = source_dir
+    file_count = source_dir.path.file_count(file_type: type)
+    
+    if file_count
+      response[:msg] = "Success"
+      response[:file_count] = file_count
+    else
+      response[:msg] = "Fail"
+    end
+    render json: response
+  end
 
-	# Returns an image file from source directory and file type
-	def get_image
-		source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
-		begin
-			send_file source_file.path, :filename => source_file.path.basename.to_s, :type => "image/#{params[:type]}"
-		rescue 
-			not_found
-		end
-	end
+  # Returns an image file from source directory and file type
+  def get_image
+    source_file = Item.new(Path.new(params[:source]+"."+params[:type]))
+    begin
+      send_file source_file.path, :filename => source_file.path.basename.to_s, :type => "image/#{params[:type]}"
+    rescue 
+      not_found
+    end
+  end
 
-	# Copies images of specified type from source directory to destination, converted with given parameters
-	def copy_and_convert_images
-		source_dir = Item.new(Path.new(params[:source]))
-		dest_dir = Item.new(Path.new(params[:dest]))
-		source_type = params[:source_type]
-		dest_type = params[:dest_type]
-		quality = params[:quality]
-		size = params[:size]
+  # Copies images of specified type from source directory to destination, converted with given parameters
+  def copy_and_convert_images
+    source_dir = Item.new(Path.new(params[:source]))
+    dest_dir = Item.new(Path.new(params[:dest]))
+    source_type = params[:source_type]
+    dest_type = params[:dest_type]
+    quality = params[:quality]
+    size = params[:size]
 
-		response = {}
-		response[:source_dir] = source_dir
-		response[:dest_dir] = dest_dir
-		if source_dir.copy_and_convert_files_to(dest_dir, source_type, dest_type, quality, size)
-			response[:msg] = "Success"
-		else
-			response[:msg] = "Fail"
-		end
-		render json: response
+    response = {}
+    response[:source_dir] = source_dir
+    response[:dest_dir] = dest_dir
+    if source_dir.copy_and_convert_files_to(dest_dir, source_type, dest_type, quality, size)
+      response[:msg] = "Success"
+    else
+      response[:msg] = "Fail"
+    end
+    render json: response
 
-	end
+  end
 
-	# Copies images of specified type from source directory to destination, converted with given parameters
-	def copy_and_convert_image
-		source_file = Item.new(Path.new(params[:source] + "." + params[:source_type]))
-		destination_type = params[:dest_type] || params[:source_type]
-		dest_file = Item.new(Path.new(params[:dest] + "." + destination_type))
-		quality = params[:quality]
-		size = params[:size]
+  # Copies images of specified type from source directory to destination, converted with given parameters
+  def copy_and_convert_image
+    source_file = Item.new(Path.new(params[:source] + "." + params[:source_type]))
+    destination_type = params[:dest_type] || params[:source_type]
+    dest_file = Item.new(Path.new(params[:dest] + "." + destination_type))
+    quality = params[:quality]
+    size = params[:size]
 
-		response = {}
-		response[:source_file] = source_file
-		response[:dest_file] = dest_file
-		if source_file.copy_and_convert_to(dest_file, quality, size)
-			response[:msg] = "Success"
-		else
-			response[:msg] = "Fail"
-		end
-		render json: response
-	end
+    response = {}
+    response[:source_file] = source_file
+    response[:dest_file] = dest_file
+    if source_file.copy_and_convert_to(dest_file, quality, size)
+      response[:msg] = "Success"
+    else
+      response[:msg] = "Fail"
+    end
+    render json: response
+  end
 
   # Moves source_dir to archive folder with suffix if folder exists
   def move_to_trash
