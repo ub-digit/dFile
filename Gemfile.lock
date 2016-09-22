@@ -44,7 +44,7 @@ GEM
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
-    combine_pdf (0.2.28)
+    combine_pdf (0.2.31)
       ruby-rc4 (>= 0.1.5)
     concurrent-ruby (1.0.2)
     diff-lcs (1.2.5)
