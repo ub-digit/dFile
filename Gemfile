@@ -25,5 +25,6 @@ end
 gem 'redis'
 
 gem 'free_disk_space'
+gem 'naturalsort'
 
 gem 'combine_pdf'
