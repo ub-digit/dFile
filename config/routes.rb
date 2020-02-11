@@ -22,5 +22,6 @@ Rails.application.routes.draw do
     get '/rename_files', to: 'items#rename_files'
     get '/convert_images', to: 'items#convert_images'
     get 'delete_files', to: 'items#delete_files'
+    get 'get_file_metadata_info', to: 'items#get_file_metadata_info'
   end
 end
