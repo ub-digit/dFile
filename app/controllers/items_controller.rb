@@ -343,6 +343,40 @@ class ItemsController < ApplicationController
     render json: response, status: 200
   end
 
+  def get_file_metadata_info
+    response = {}
+    source_dir = Item.new(Path.new(params[:source_dir]))
+
+    # Check if source package folder exists
+    if !source_dir.exist?
+      response[:msg] = "No folder at location #{source_dir.path.to_s}, nothing to do"
+      render json: response, status: 404
+      return
+    end
+
+    # Check if the directory contains files
+    children = source_dir.child_items
+    if children.blank?
+      response[:msg] = "No files at #{source_dir.path.to_s}"
+      render json: response, status: 404
+      return
+    end
+
+    # Get name of the midmost tif file
+    filename = children[children.length / 2]
+
+    # Get some metadata info
+    res = `identify -format '%[tiff:*]' #{filename}`
+    response = {make: nil, model: nil, software: nil}
+    res.split("\n").each do |tag|
+      response[:make] = tag['tiff:make='.length..-1]  if tag.start_with?('tiff:make=')
+      response[:model] = tag['tiff:model='.length..-1] if tag.start_with?('tiff:model=')
+      response[:software] = tag['tiff:software='.length..-1] if tag.start_with?('tiff:software=')
+    end
+
+    render json: response
+  end
+
   private
   def create_process(process:)
     # Ask redis for id
