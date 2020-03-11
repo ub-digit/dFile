@@ -367,7 +367,7 @@ class ItemsController < ApplicationController
 
     # Get some metadata info
     res = `identify -format '%[tiff:*]' #{filename}`
-    response = {make: nil, model: nil, software: nil}
+    response = {make: "NO DATA", model: "NO DATA", software: "NO DATA"}
     res.split("\n").each do |tag|
       response[:make] = tag['tiff:make='.length..-1]  if tag.start_with?('tiff:make=')
       response[:model] = tag['tiff:model='.length..-1] if tag.start_with?('tiff:model=')
