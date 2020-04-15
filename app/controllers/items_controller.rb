@@ -293,6 +293,22 @@ class ItemsController < ApplicationController
     end
   end
 
+  def delete_file
+    source_file = Item.new(Path.new(params[:source_file]))
+
+    response = {}
+    if !source_file.file_exist?
+      response[:error] = "No file at location #{params[:source_file]}"
+      render json: response, status: 404
+    elsif FileManager.delete_file(source_file.path)
+      response[:msg] = "Success"
+      render json: response, status: 200
+    else
+      response[:error] = "Fail"
+      render json: response, status: 422
+    end
+  end
+
   # Returns a thumbnail file for a specified source with given size and source type
   def thumbnail
     source_dir = Item.new(Path.new(params[:source_dir]))
