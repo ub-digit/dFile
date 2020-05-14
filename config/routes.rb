@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     get 'thumbnail', to: 'items#thumbnail'
     get '/rename_files', to: 'items#rename_files'
     get '/convert_images', to: 'items#convert_images'
+    get 'delete_folder', to: 'items#delete_files'
     get 'delete_files', to: 'items#delete_files'
     get 'delete_file', to: 'items#delete_file'
     get 'get_file_metadata_info', to: 'items#get_file_metadata_info'
