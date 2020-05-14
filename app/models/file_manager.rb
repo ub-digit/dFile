@@ -17,6 +17,7 @@ class FileManager
 
   def self.move(source_path, dest_path)
     FileUtils.mv(source_path.to_s, dest_path.to_s)
+    return true
   end
 
   def self.create(dest_path, content, permission=nil)
