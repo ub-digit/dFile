@@ -1,7 +1,12 @@
 require 'yaml'
 
 # Load Redis config
-REDIS_CONFIG = YAML.load( File.open( Rails.root.join("config/redis.yml") ) ).symbolize_keys
+require "erb"
+require "yaml"
+redis_config_file =  'config/redis.yml'
+yaml = Pathname.new("#{Rails.root}/#{redis_config_file}")
+redis_config = YAML.load(ERB.new(yaml.read).result(binding))
+REDIS_CONFIG = redis_config.symbolize_keys #YAML.load(File.open( Rails.root.join("config/redis.yml")) ).symbolize_keys
 default_config = REDIS_CONFIG[:default].symbolize_keys
 config = default_config.merge(REDIS_CONFIG[Rails.env.to_sym].symbolize_keys) if REDIS_CONFIG[Rails.env.to_sym]
 
