@@ -28,7 +28,7 @@
 .swp
 
 config/initializers/api_key.rb
-config/initializers/config.rb
+#config/initializers/config.rb
 
 config/deploy.yml
 config/redis.yml
