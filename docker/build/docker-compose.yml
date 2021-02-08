@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+  dfile:
+    image: docker.ub.gu.se/dfile:${GIT_REVISION}
+    build:
+      context: ./dfile
+      args:
+        - GIT_REPO_URL=${GIT_REPO_URL}
+        - GIT_REVISION=${GIT_REVISION}
+  reddis:
+    image: redis:6.0.10
+    volumes:
+        - redis:/data
+    command: redis-serve
+
+volumes:
+    redis:
