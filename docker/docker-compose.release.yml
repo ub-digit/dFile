@@ -1,0 +1,9 @@
+version: "3.5"
+
+services:
+  dfile:
+    image: docker.ub.gu.se/dfile:${GIT_REVISION}
+    ports:
+      # Port differs in release image for ember
+      # TODO: Change so nginx listens at 4200 instead to we don't need this?
+      - 8083:3000

@@ -16,8 +16,6 @@ services:
             - DFILE_PACKAGING_PATH=${DFILE_PACKAGING_PATH}
             - DFILE_TRASH_PATH=${DFILE_TRASH_PATH}
             - DFILE_CONFIGURATION_PATH=${DFILE_CONFIGURATION_PATH}
-        ports:
-            - ${DFILE_RAILS_SERVICE_PORT}:3000
         networks:
             - default
     redis:

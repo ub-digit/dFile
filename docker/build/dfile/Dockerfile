@@ -11,7 +11,7 @@ RUN set -ex \
 
 FROM docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8
 
-COPY --from=release /root/release/app /usr/src/app
+COPY --from=release /root/release/ /usr/src/app
 
 RUN bundle install
 

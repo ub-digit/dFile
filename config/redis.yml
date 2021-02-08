@@ -8,4 +8,4 @@ test:
 lab:
   db: 2
 production:
-  db: 2
+  db: 2cd

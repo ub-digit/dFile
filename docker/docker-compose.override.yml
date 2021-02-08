@@ -10,6 +10,6 @@ services:
             - ../../dFile/filevault/processing:/usr/src/app/filevault/processing
             - ../../dFile/filevault/store:/usr/src/app/filevault/store
             - ../../dFile/filevault/trash:/usr/src/app/filevault/trash
-
-
+        ports:
+            - ${DFILE_RAILS_SERVICE_PORT}:3000
         command: ["sh", "-c", "bundle install && rm -f /usr/src/app/tmp/pids/server.pid && rails server -b 0.0.0.0"]
