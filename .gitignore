@@ -31,7 +31,7 @@ config/initializers/api_key.rb
 #config/initializers/config.rb
 
 config/deploy.yml
-config/redis.yml
+#config/redis.yml
 
 # Ignore generated css etc.
 .sass-cache/
