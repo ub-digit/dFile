@@ -16,15 +16,11 @@ services:
             - DFILE_PACKAGING_PATH=${DFILE_PACKAGING_PATH}
             - DFILE_TRASH_PATH=${DFILE_TRASH_PATH}
             - DFILE_CONFIGURATION_PATH=${DFILE_CONFIGURATION_PATH}
-        networks:
-            - default
     redis:
         image: redis:6.0.10
         volumes:
             - redis:/data
         command: redis-server
-        networks:
-            - default
 
 volumes:
     redis:
