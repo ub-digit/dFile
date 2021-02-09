@@ -7,11 +7,4 @@ services:
       args:
         - GIT_REPO_URL=${GIT_REPO_URL}
         - GIT_REVISION=${GIT_REVISION}
-  reddis:
-    image: redis:6.0.10
-    volumes:
-        - redis:/data
-    command: redis-serve
-
 volumes:
-    redis:
