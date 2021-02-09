@@ -7,5 +7,7 @@ test:
   db: 1
 lab:
   db: 2
+staging:
+  db: 2
 production:
   db: 2
