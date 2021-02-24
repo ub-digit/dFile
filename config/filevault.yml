@@ -1,0 +1,7 @@
+dfile_paths:
+  PROCESSING: /usr/src/app/filevault/processing
+  TEST_PROCESSING: /usr/src/app/filevault/processing
+  PACKAGING: /usr/src/app/filevault/packaging
+  STORE: /usr/src/app/filevault/store
+  TRASH: /usr/src/app/filevault/trash
+  CONFIGURATION: /usr/src/app/filevault/config
