@@ -5,6 +5,11 @@ services:
         image: docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8
         volumes:
             - ../../dFile:/usr/src/app
+            - ../../dFile/filevault/config:/usr/src/app/filevault/config
+            - ../../dFile/filevault/packaging:/usr/src/app/filevault/packaging
+            - ../../dFile/filevault/processing:/usr/src/app/filevault/processing
+            - ../../dFile/filevault/store:/usr/src/app/filevault/store
+            - ../../dFile/filevault/trash:/usr/src/app/filevault/trash
         ports:
             - ${DFILE_RAILS_SERVICE_PORT}:3000
         command: ["sh", "-c", "bundle install && rm -f /usr/src/app/tmp/pids/server.pid && rails server -b 0.0.0.0"]
