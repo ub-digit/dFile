@@ -23,7 +23,7 @@ group :development do
   gem 'capistrano-rvm'
 end
 
-gem 'redis'
+gem 'redis', '~> 3.3.0'
 
 gem 'free_disk_space'
 gem 'naturalsort'
