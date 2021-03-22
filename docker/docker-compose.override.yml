@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
     dfile:
-        image: docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8
+        image: docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8-2021-03-003
         volumes:
             - ../../dFile:/usr/src/app
             - ../../dFile/filevault/config:/usr/src/app/filevault/config

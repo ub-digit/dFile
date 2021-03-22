@@ -9,7 +9,7 @@ WORKDIR /root/
 RUN set -ex \
   && git clone $GIT_REPO_URL release -b $GIT_REVISION --depth 1
 
-FROM docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8-002
+FROM docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8-2021-03-003
 
 COPY --from=release /root/release/ /usr/src/app
 
