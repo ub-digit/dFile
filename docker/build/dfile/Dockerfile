@@ -12,7 +12,11 @@ RUN set -ex \
 FROM docker.ub.gu.se/rails-imagemagick7:ruby-2.5.8-2021-03-003
 
 COPY --from=release /root/release/ /usr/src/app
-
+RUN /bin/echo -e '#!/bin/bash\numask 0002\nexec "$@"' > /var/tmp/umask.sh
+RUN chmod +x /var/tmp/umask.sh
+ 
 RUN bundle install
+
+ENTRYPOINT ["/var/tmp/umask.sh"]
 
 CMD ["sh", "-c", "rm -f /usr/src/app/tmp/pids/server.pid && rails server -b 0.0.0.0 -e $ENVIRONMENT"]
