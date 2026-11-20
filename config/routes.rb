@@ -1,29 +1,28 @@
 Rails.application.routes.draw do
-
-  controller :items, :defaults => {:format => :json} do
-    get '/checksum', to: 'items#checksum'
-    get '/move_folder_ind', to: 'items#move_folder_ind'
-    get '/copy_folder_ind', to: 'items#copy_folder_ind'
-    get '/move_folder', to: 'items#move_folder'
-    post '/create_file', to: 'items#create_file'
-    get '/copy_file', to: 'items#copy_file'
-    get '/copy_files', to: 'items#copy_files'
-    get '/move_files', to: 'items#move_files'
-    get '/move_file', to: 'items#move_file'
-    get '/list_files', to: 'items#list_files'
-    get '/combine_pdf_files', to: 'items#combine_pdf_files'
-    get '/file_count', to: 'items#file_count'
-    get '/get_image', to: 'items#get_image'
-    get '/copy_and_convert_images', to: 'items#copy_and_convert_images'
-    get '/copy_and_convert_image', to: 'items#copy_and_convert_image'
-    get '/download_file', to: 'items#download_file', defaults: {format: :file}
-    get 'move_to_trash', to: 'items#move_to_trash'
-    get 'thumbnail', to: 'items#thumbnail'
-    get '/rename_files', to: 'items#rename_files'
-    get '/convert_images', to: 'items#convert_images'
-    get 'delete_folder', to: 'items#delete_files'
-    get 'delete_files', to: 'items#delete_files'
-    get 'delete_file', to: 'items#delete_file'
-    get 'get_file_metadata_info', to: 'items#get_file_metadata_info'
+  scope controller: :items, defaults: { format: :json } do
+    get '/checksum', action: :checksum
+    get '/move_folder_ind', action: :move_folder_ind
+    get '/copy_folder_ind', action: :copy_folder_ind
+    get '/move_folder', action: :move_folder
+    post '/create_file', action: :create_file
+    get '/copy_file', action: :copy_file
+    get '/copy_files', action: :copy_files
+    get '/move_files', action: :move_files
+    get '/move_file', action: :move_file
+    get '/list_files', action: :list_files
+    get '/combine_pdf_files', action: :combine_pdf_files
+    get '/file_count', action: :file_count
+    get '/get_image', action: :get_image
+    get '/copy_and_convert_images', action: :copy_and_convert_images
+    get '/copy_and_convert_image', action: :copy_and_convert_image
+    get '/download_file', action: :download_file, defaults: { format: :file }
+    get '/move_to_trash', action: :move_to_trash
+    get '/thumbnail', action: :thumbnail
+    get '/rename_files', action: :rename_files
+    get '/convert_images', action: :convert_images
+    get '/delete_folder', action: :delete_files
+    get '/delete_files', action: :delete_files
+    get '/delete_file', action: :delete_file
+    get '/get_file_metadata_info', action: :get_file_metadata_info
   end
 end

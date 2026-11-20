@@ -3,7 +3,8 @@ services:
   dfile:
     image: docker.ub.gu.se/dfile:${GIT_REVISION}
     build:
-      context: ./dfile
+      context: ../..
+      dockerfile: docker/build/dfile/Dockerfile
       args:
         - GIT_REPO_URL=${GIT_REPO_URL}
         - GIT_REVISION=${GIT_REVISION}
